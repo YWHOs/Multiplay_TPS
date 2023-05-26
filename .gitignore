@@ -74,9 +74,6 @@ Plugins/*/Intermediate/*
 DerivedDataCache/*
 Content/Megascans
 Content/StarterContent
-Content/BlackAlder
-Content/MedievalDungeon
 .vscode
 Content/AssetPack
-Content/EchoContent
-Content/AncientTreasures
+Content/Mixamo
