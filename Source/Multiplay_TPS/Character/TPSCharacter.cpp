@@ -5,6 +5,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/WidgetComponent.h"
 
 ATPSCharacter::ATPSCharacter()
 {
@@ -21,6 +22,9 @@ ATPSCharacter::ATPSCharacter()
 
 	bUseControllerRotationYaw = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
+
+	overheadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverheadWidget"));
+	overheadWidget->SetupAttachment(RootComponent);
 }
 
 void ATPSCharacter::BeginPlay()
