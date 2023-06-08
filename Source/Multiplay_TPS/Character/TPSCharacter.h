@@ -25,6 +25,7 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
@@ -35,4 +36,11 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UWidgetComponent* overheadWidget;
 
+	UPROPERTY(ReplicatedUsing = OnRep_OverlappingWeapon)
+	class AWeapon* overlappingWeapon;
+
+	UFUNCTION()
+	void OnRep_OverlappingWeapon(AWeapon* _LastWeapon);
+public:
+	void SetOverlappingWeapon(AWeapon* _Weapon);
 };

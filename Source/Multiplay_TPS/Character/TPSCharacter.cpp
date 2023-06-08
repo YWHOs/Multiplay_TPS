@@ -6,6 +6,8 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/WidgetComponent.h"
+#include "Net/UnrealNetwork.h"
+#include "Multiplay_TPS/Weapon/Weapon.h"
 
 ATPSCharacter::ATPSCharacter()
 {
@@ -26,13 +28,21 @@ ATPSCharacter::ATPSCharacter()
 	overheadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverheadWidget"));
 	overheadWidget->SetupAttachment(RootComponent);
 }
+void ATPSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	DOREPLIFETIME_CONDITION(ATPSCharacter, overlappingWeapon, COND_OwnerOnly);
+}
 void ATPSCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
 }
-
+void ATPSCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+}
 void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -44,6 +54,7 @@ void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAxis("Turn", this, &ATPSCharacter::Turn);
 	PlayerInputComponent->BindAxis("LookUp", this, &ATPSCharacter::LookUp);
 }
+
 void ATPSCharacter::MoveForward(float _value)
 {
 	if (Controller && _value != 0.f)
@@ -73,11 +84,29 @@ void ATPSCharacter::LookUp(float _value)
 {
 	AddControllerPitchInput(_value);
 }
-
-void ATPSCharacter::Tick(float DeltaTime)
+void ATPSCharacter::SetOverlappingWeapon(AWeapon* _Weapon)
 {
-	Super::Tick(DeltaTime);
-
+	if (overlappingWeapon)
+	{
+		overlappingWeapon->ShowPickupWidget(false);
+	}
+	overlappingWeapon = _Weapon;
+	if (IsLocallyControlled())
+	{
+		if (overlappingWeapon)
+		{
+			overlappingWeapon->ShowPickupWidget(true);
+		}
+	}
 }
-
-
+void ATPSCharacter::OnRep_OverlappingWeapon(AWeapon* _LastWeapon)
+{
+	if (overlappingWeapon)
+	{
+		overlappingWeapon->ShowPickupWidget(true);
+	}
+	if (_LastWeapon)
+	{
+		_LastWeapon->ShowPickupWidget(false);
+	}
+}

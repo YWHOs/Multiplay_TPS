@@ -39,6 +39,7 @@ void AWeapon::BeginPlay()
 		areaSphere->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		areaSphere->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
 		areaSphere->OnComponentBeginOverlap.AddDynamic(this, &AWeapon::OnSphereOverlap);
+		areaSphere->OnComponentEndOverlap.AddDynamic(this, &AWeapon::OnSphereEndOverlap);
 	}
 	if (pickupWidget)
 	{
@@ -56,8 +57,23 @@ void AWeapon::Tick(float DeltaTime)
 void AWeapon::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OhterComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	ATPSCharacter* character = Cast<ATPSCharacter>(OtherActor);
-	if (character && pickupWidget)
+	if (character)
 	{
-		pickupWidget->SetVisibility(true);
+		character->SetOverlappingWeapon(this);
+	}
+}
+void AWeapon::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OhterComp, int32 OtherBodyIndex)
+{
+	ATPSCharacter* character = Cast<ATPSCharacter>(OtherActor);
+	if (character)
+	{
+		character->SetOverlappingWeapon(nullptr);
+	}
+}
+void AWeapon::ShowPickupWidget(bool _bShowWidget)
+{
+	if (pickupWidget)
+	{
+		pickupWidget->SetVisibility(_bShowWidget);
 	}
 }
