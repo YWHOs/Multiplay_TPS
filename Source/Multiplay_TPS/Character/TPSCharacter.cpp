@@ -8,6 +8,7 @@
 #include "Components/WidgetComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "Multiplay_TPS/Weapon/Weapon.h"
+#include "Multiplay_TPS/Components/CombatComponent.h"
 
 ATPSCharacter::ATPSCharacter()
 {
@@ -27,6 +28,9 @@ ATPSCharacter::ATPSCharacter()
 
 	overheadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverheadWidget"));
 	overheadWidget->SetupAttachment(RootComponent);
+
+	combatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
+	combatComponent->SetIsReplicated(true);
 }
 void ATPSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
@@ -53,6 +57,17 @@ void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAxis("MoveRight", this, &ATPSCharacter::MoveRight);
 	PlayerInputComponent->BindAxis("Turn", this, &ATPSCharacter::Turn);
 	PlayerInputComponent->BindAxis("LookUp", this, &ATPSCharacter::LookUp);
+
+	PlayerInputComponent->BindAction("Equip", IE_Pressed, this, &ATPSCharacter::EquipPressed);
+}
+
+void ATPSCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	if (combatComponent)
+	{
+		combatComponent->character = this;
+	}
 }
 
 void ATPSCharacter::MoveForward(float _value)
@@ -84,6 +99,15 @@ void ATPSCharacter::LookUp(float _value)
 {
 	AddControllerPitchInput(_value);
 }
+
+void ATPSCharacter::EquipPressed()
+{
+	if (combatComponent && HasAuthority())
+	{
+		combatComponent->EquipWeapon(overlappingWeapon);
+	}
+}
+
 void ATPSCharacter::SetOverlappingWeapon(AWeapon* _Weapon)
 {
 	if (overlappingWeapon)

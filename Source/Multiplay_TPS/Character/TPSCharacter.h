@@ -21,11 +21,13 @@ protected:
 	void MoveRight(float _value);
 	void Turn(float _value);
 	void LookUp(float _value);
+	void EquipPressed();
 
 public:	
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void PostInitializeComponents() override;
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
@@ -39,8 +41,13 @@ private:
 	UPROPERTY(ReplicatedUsing = OnRep_OverlappingWeapon)
 	class AWeapon* overlappingWeapon;
 
+	UPROPERTY(VisibleAnywhere)
+	class UCombatComponent* combatComponent;
+	
 	UFUNCTION()
 	void OnRep_OverlappingWeapon(AWeapon* _LastWeapon);
+
+
 public:
 	void SetOverlappingWeapon(AWeapon* _Weapon);
 };
