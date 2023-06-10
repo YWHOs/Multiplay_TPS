@@ -43,6 +43,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	class UCombatComponent* combatComponent;
+
+	UFUNCTION(Server, Reliable)
+	void ServerEquipButtonPressed();
 	
 	UFUNCTION()
 	void OnRep_OverlappingWeapon(AWeapon* _LastWeapon);

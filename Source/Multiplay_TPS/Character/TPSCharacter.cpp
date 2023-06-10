@@ -102,9 +102,17 @@ void ATPSCharacter::LookUp(float _value)
 
 void ATPSCharacter::EquipPressed()
 {
-	if (combatComponent && HasAuthority())
+	if (combatComponent)
 	{
-		combatComponent->EquipWeapon(overlappingWeapon);
+		if (HasAuthority())
+		{
+			combatComponent->EquipWeapon(overlappingWeapon);
+		}
+		else
+		{
+			ServerEquipButtonPressed();
+		}
+		
 	}
 }
 
@@ -121,6 +129,13 @@ void ATPSCharacter::SetOverlappingWeapon(AWeapon* _Weapon)
 		{
 			overlappingWeapon->ShowPickupWidget(true);
 		}
+	}
+}
+void ATPSCharacter::ServerEquipButtonPressed_Implementation()
+{
+	if (combatComponent)
+	{
+		combatComponent->EquipWeapon(overlappingWeapon);
 	}
 }
 void ATPSCharacter::OnRep_OverlappingWeapon(AWeapon* _LastWeapon)

@@ -5,6 +5,7 @@
 #include "Multiplay_TPS/Weapon/Weapon.h"
 #include "Multiplay_TPS/Character/TPSCharacter.h"
 #include "Engine/SkeletalMeshSocket.h"
+#include "Components/SphereComponent.h"
 
 // Sets default values for this component's properties
 UCombatComponent::UCombatComponent()
@@ -42,5 +43,4 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 		handSocket->AttachActor(equippedWeapon, character->GetMesh());
 	}
 	equippedWeapon->SetOwner(character);
-	equippedWeapon->ShowPickupWidget(false);
 }
