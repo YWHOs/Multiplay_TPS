@@ -62,6 +62,8 @@ void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 	PlayerInputComponent->BindAction("Equip", IE_Pressed, this, &ATPSCharacter::EquipPressed);
 	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &ATPSCharacter::CrouchPressed);
+	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &ATPSCharacter::AimPressed);
+	PlayerInputComponent->BindAction("Aim", IE_Released, this, &ATPSCharacter::AimReleased);
 }
 
 void ATPSCharacter::PostInitializeComponents()
@@ -129,6 +131,20 @@ void ATPSCharacter::CrouchPressed()
 		Crouch();
 	}
 }
+void ATPSCharacter::AimPressed()
+{
+	if (combatComponent)
+	{
+		combatComponent->SetAiming(true);
+	}
+}
+void ATPSCharacter::AimReleased()
+{
+	if (combatComponent)
+	{
+		combatComponent->SetAiming(false);
+	}
+}
 
 void ATPSCharacter::SetOverlappingWeapon(AWeapon* _Weapon)
 {
@@ -166,4 +182,8 @@ void ATPSCharacter::OnRep_OverlappingWeapon(AWeapon* _LastWeapon)
 bool ATPSCharacter::IsWeaponEquipped()
 {
 	return (combatComponent && combatComponent->equippedWeapon);
+}
+bool ATPSCharacter::IsAiming()
+{
+	return (combatComponent && combatComponent->bAiming);
 }

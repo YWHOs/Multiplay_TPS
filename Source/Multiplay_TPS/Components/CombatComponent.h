@@ -27,12 +27,19 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+	void SetAiming(bool bIsAiming);
+
+	UFUNCTION(Server, Reliable)
+	void ServerSetAiming(bool bIsAiming);
 
 private:
 	class ATPSCharacter* character;
 
 	UPROPERTY(Replicated)
 	AWeapon* equippedWeapon;
+
+	UPROPERTY(Replicated)
+	bool bAiming;
 
 public:	
 	FORCEINLINE ATPSCharacter* GetCharacter() { return character; }

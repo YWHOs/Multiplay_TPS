@@ -23,6 +23,8 @@ protected:
 	void LookUp(float _value);
 	void EquipPressed();
 	void CrouchPressed();
+	void AimPressed();
+	void AimReleased();
 
 public:	
 	virtual void Tick(float DeltaTime) override;
@@ -55,4 +57,5 @@ private:
 public:
 	void SetOverlappingWeapon(AWeapon* _Weapon);
 	bool IsWeaponEquipped();
+	bool IsAiming();
 };

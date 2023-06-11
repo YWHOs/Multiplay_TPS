@@ -30,4 +30,5 @@ void UTPSAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	bIsAccelerating = character->GetCharacterMovement()->GetCurrentAcceleration().Size() > 0.f ? true : false;
 	bWeaponEquipped = character->IsWeaponEquipped();
 	bIsCrouched = character->bIsCrouched;
+	bAiming = character->IsAiming();
 }
