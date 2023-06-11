@@ -22,6 +22,7 @@ protected:
 	void Turn(float _value);
 	void LookUp(float _value);
 	void EquipPressed();
+	void CrouchPressed();
 
 public:	
 	virtual void Tick(float DeltaTime) override;

@@ -31,6 +31,8 @@ ATPSCharacter::ATPSCharacter()
 
 	combatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	combatComponent->SetIsReplicated(true);
+
+	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
 }
 void ATPSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
@@ -59,6 +61,7 @@ void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAxis("LookUp", this, &ATPSCharacter::LookUp);
 
 	PlayerInputComponent->BindAction("Equip", IE_Pressed, this, &ATPSCharacter::EquipPressed);
+	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &ATPSCharacter::CrouchPressed);
 }
 
 void ATPSCharacter::PostInitializeComponents()
@@ -113,6 +116,17 @@ void ATPSCharacter::EquipPressed()
 			ServerEquipButtonPressed();
 		}
 		
+	}
+}
+void ATPSCharacter::CrouchPressed()
+{
+	if (bIsCrouched)
+	{
+		UnCrouch();
+	}
+	else
+	{
+		Crouch();
 	}
 }
 
