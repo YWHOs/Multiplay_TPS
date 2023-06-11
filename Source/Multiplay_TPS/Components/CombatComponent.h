@@ -16,9 +16,11 @@ class MULTIPLAY_TPS_API UCombatComponent : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UCombatComponent();
+	friend class ATPSCharacter;
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	friend class ATPSCharacter;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
 
 	void EquipWeapon(AWeapon* WeaponToEquip);
 
@@ -28,6 +30,8 @@ protected:
 
 private:
 	class ATPSCharacter* character;
+
+	UPROPERTY(Replicated)
 	AWeapon* equippedWeapon;
 
 public:	

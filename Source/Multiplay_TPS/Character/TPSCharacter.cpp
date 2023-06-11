@@ -149,3 +149,7 @@ void ATPSCharacter::OnRep_OverlappingWeapon(AWeapon* _LastWeapon)
 		_LastWeapon->ShowPickupWidget(false);
 	}
 }
+bool ATPSCharacter::IsWeaponEquipped()
+{
+	return (combatComponent && combatComponent->equippedWeapon);
+}
