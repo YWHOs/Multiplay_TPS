@@ -32,10 +32,13 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void ServerSetAiming(bool bIsAiming);
 
+	UFUNCTION()
+	void OnRep_EquippedWeapon();
+
 private:
 	class ATPSCharacter* character;
 
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon)
 	AWeapon* equippedWeapon;
 
 	UPROPERTY(Replicated)

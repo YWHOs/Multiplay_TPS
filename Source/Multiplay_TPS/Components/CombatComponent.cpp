@@ -7,6 +7,7 @@
 #include "Engine/SkeletalMeshSocket.h"
 #include "Components/SphereComponent.h"
 #include "Net/UnrealNetwork.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values for this component's properties
 UCombatComponent::UCombatComponent()
@@ -26,6 +27,14 @@ void UCombatComponent::SetAiming(bool bIsAiming)
 {
 	bAiming = bIsAiming;
 	ServerSetAiming(bIsAiming);
+}
+void UCombatComponent::OnRep_EquippedWeapon()
+{
+	if (equippedWeapon && character)
+	{
+		character->GetCharacterMovement()->bOrientRotationToMovement = false;
+		character->bUseControllerRotationYaw = true;
+	}
 }
 void UCombatComponent::ServerSetAiming_Implementation(bool bIsAiming)
 {
@@ -57,4 +66,6 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 		handSocket->AttachActor(equippedWeapon, character->GetMesh());
 	}
 	equippedWeapon->SetOwner(character);
+	character->GetCharacterMovement()->bOrientRotationToMovement = false;
+	character->bUseControllerRotationYaw = true;
 }
