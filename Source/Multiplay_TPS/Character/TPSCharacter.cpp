@@ -10,6 +10,7 @@
 #include "Multiplay_TPS/Weapon/Weapon.h"
 #include "Multiplay_TPS/Components/CombatComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 ATPSCharacter::ATPSCharacter()
 {
@@ -51,6 +52,8 @@ void ATPSCharacter::BeginPlay()
 void ATPSCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	AimOffset(DeltaTime);
 }
 void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -148,7 +151,31 @@ void ATPSCharacter::AimReleased()
 		combatComponent->SetAiming(false);
 	}
 }
+void ATPSCharacter::AimOffset(float DeltaTime)
+{
+	if (combatComponent && combatComponent->equippedWeapon == nullptr) return;
 
+	FVector velocity = GetVelocity();
+	velocity.Z = 0.f;
+	float speed = velocity.Size();
+	bool bIsAir = GetCharacterMovement()->IsFalling();
+
+	if (speed == 0.f && !bIsAir)
+	{
+		FRotator currentAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
+		FRotator deltaAimRotation = UKismetMathLibrary::NormalizedDeltaRotator(currentAimRotation, startAimRotation);
+		ao_Yaw = deltaAimRotation.Yaw;
+		bUseControllerRotationYaw = false;
+	}
+	if (speed > 0.f || bIsAir)
+	{
+		startAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
+		ao_Yaw = 0.f;
+		bUseControllerRotationYaw = true;
+	}
+
+	ao_Pitch = GetBaseAimRotation().Pitch;
+}
 void ATPSCharacter::SetOverlappingWeapon(AWeapon* _Weapon)
 {
 	if (overlappingWeapon)

@@ -46,4 +46,7 @@ void UTPSAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	const float target = delta.Yaw / DeltaTime;
 	const float interp = FMath::FInterpTo(lean, target, DeltaTime, 6.f);
 	lean = FMath::Clamp(interp, -90.f, 90.f);
+
+	ao_Yaw = character->GetAO_Yaw();
+	ao_Pitch = character->GetAO_Pitch();
 }

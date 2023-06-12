@@ -25,6 +25,7 @@ protected:
 	void CrouchPressed();
 	void AimPressed();
 	void AimReleased();
+	void AimOffset(float DeltaTime);
 
 public:	
 	virtual void Tick(float DeltaTime) override;
@@ -53,9 +54,17 @@ private:
 	UFUNCTION()
 	void OnRep_OverlappingWeapon(AWeapon* _LastWeapon);
 
+	float ao_Yaw;
+	float ao_Pitch;
+	FRotator startAimRotation;
+
 
 public:
 	void SetOverlappingWeapon(AWeapon* _Weapon);
 	bool IsWeaponEquipped();
 	bool IsAiming();
+
+public:
+	FORCEINLINE float GetAO_Yaw() const { return ao_Yaw; }
+	FORCEINLINE float GetAO_Pitch() const { return ao_Pitch; }
 };
