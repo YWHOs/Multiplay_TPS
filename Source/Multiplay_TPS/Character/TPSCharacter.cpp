@@ -9,6 +9,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Multiplay_TPS/Weapon/Weapon.h"
 #include "Multiplay_TPS/Components/CombatComponent.h"
+#include "Components/CapsuleComponent.h"
 
 ATPSCharacter::ATPSCharacter()
 {
@@ -33,6 +34,8 @@ ATPSCharacter::ATPSCharacter()
 	combatComponent->SetIsReplicated(true);
 
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 }
 void ATPSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
