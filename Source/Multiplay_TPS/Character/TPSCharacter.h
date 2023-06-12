@@ -67,4 +67,5 @@ public:
 public:
 	FORCEINLINE float GetAO_Yaw() const { return ao_Yaw; }
 	FORCEINLINE float GetAO_Pitch() const { return ao_Pitch; }
+	AWeapon* GetEquippedWeapon();
 };

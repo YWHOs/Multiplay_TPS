@@ -5,6 +5,7 @@
 #include "TPSCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Multiplay_TPS/Weapon/Weapon.h"
 
 void UTPSAnimInstance::NativeInitializeAnimation()
 {
@@ -30,6 +31,7 @@ void UTPSAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	bIsAir = character->GetCharacterMovement()->IsFalling();
 	bIsAccelerating = character->GetCharacterMovement()->GetCurrentAcceleration().Size() > 0.f ? true : false;
 	bWeaponEquipped = character->IsWeaponEquipped();
+	equippedWeapon = character->GetEquippedWeapon();
 	bIsCrouched = character->bIsCrouched;
 	bAiming = character->IsAiming();
 
@@ -49,4 +51,15 @@ void UTPSAnimInstance::NativeUpdateAnimation(float DeltaTime)
 
 	ao_Yaw = character->GetAO_Yaw();
 	ao_Pitch = character->GetAO_Pitch();
+
+	// 캐릭터 무기 들었을 때, 왼손 위치 이동
+	if (bWeaponEquipped && equippedWeapon && equippedWeapon->GetWeaponMesh() && character->GetMesh())
+	{
+		lefthandTransform = equippedWeapon->GetWeaponMesh()->GetSocketTransform(FName("LeftHandSocket"), ERelativeTransformSpace::RTS_World);
+		FVector outPos;
+		FRotator outRot;
+		character->GetMesh()->TransformToBoneSpace(FName("hand_r"), lefthandTransform.GetLocation(), FRotator::ZeroRotator, outPos, outRot);
+		lefthandTransform.SetLocation(outPos);
+		lefthandTransform.SetRotation(FQuat(outRot));
+	}
 }

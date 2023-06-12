@@ -175,6 +175,13 @@ void ATPSCharacter::AimOffset(float DeltaTime)
 	}
 
 	ao_Pitch = GetBaseAimRotation().Pitch;
+	if (ao_Pitch > 90.f && !IsLocallyControlled())
+	{
+		// 270, 360 À» -90, 0
+		FVector2D inRange(270.f, 360.f);
+		FVector2D outRange(-90.f, 0.f);
+		ao_Pitch = FMath::GetMappedRangeValueClamped(inRange, outRange, ao_Pitch);
+	}
 }
 void ATPSCharacter::SetOverlappingWeapon(AWeapon* _Weapon)
 {
@@ -216,4 +223,9 @@ bool ATPSCharacter::IsWeaponEquipped()
 bool ATPSCharacter::IsAiming()
 {
 	return (combatComponent && combatComponent->bAiming);
+}
+AWeapon* ATPSCharacter::GetEquippedWeapon()
+{
+	if (combatComponent == nullptr) return nullptr;
+	return combatComponent->equippedWeapon;
 }
