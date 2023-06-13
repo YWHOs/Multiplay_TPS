@@ -37,6 +37,8 @@ ATPSCharacter::ATPSCharacter()
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+	
+	turningInPlace = ETurningInPlace::ETIP_NotTurn;
 }
 void ATPSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
@@ -160,18 +162,28 @@ void ATPSCharacter::AimOffset(float DeltaTime)
 	float speed = velocity.Size();
 	bool bIsAir = GetCharacterMovement()->IsFalling();
 
+	// 멈추거나, 점프X
 	if (speed == 0.f && !bIsAir)
 	{
 		FRotator currentAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
 		FRotator deltaAimRotation = UKismetMathLibrary::NormalizedDeltaRotator(currentAimRotation, startAimRotation);
 		ao_Yaw = deltaAimRotation.Yaw;
-		bUseControllerRotationYaw = false;
+		if (turningInPlace == ETurningInPlace::ETIP_NotTurn)
+		{
+			interpAO_Yaw = ao_Yaw;
+		}
+		bUseControllerRotationYaw = true;
+
+		TurnInPlace(DeltaTime);
 	}
+	// 달리거나, 점프
 	if (speed > 0.f || bIsAir)
 	{
 		startAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
 		ao_Yaw = 0.f;
 		bUseControllerRotationYaw = true;
+
+		turningInPlace = ETurningInPlace::ETIP_NotTurn;
 	}
 
 	ao_Pitch = GetBaseAimRotation().Pitch;
@@ -181,6 +193,28 @@ void ATPSCharacter::AimOffset(float DeltaTime)
 		FVector2D inRange(270.f, 360.f);
 		FVector2D outRange(-90.f, 0.f);
 		ao_Pitch = FMath::GetMappedRangeValueClamped(inRange, outRange, ao_Pitch);
+	}
+}
+void ATPSCharacter::TurnInPlace(float DeltaTime)
+{
+	if (ao_Yaw > 90.f)
+	{
+		turningInPlace = ETurningInPlace::ETIP_Right;
+	}
+	else if (ao_Yaw < -90.f)
+	{
+		turningInPlace = ETurningInPlace::ETIP_Left;
+	}
+	if (turningInPlace != ETurningInPlace::ETIP_NotTurn)
+	{
+		// 몸을 돌리면 그 방향으로 Bone 위치 회전
+		interpAO_Yaw = FMath::FInterpTo(interpAO_Yaw, 0.f, DeltaTime, 5.f);
+		ao_Yaw = interpAO_Yaw;
+		if (FMath::Abs(ao_Yaw) < 15.f)
+		{
+			turningInPlace = ETurningInPlace::ETIP_NotTurn;
+			startAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
+		}
 	}
 }
 void ATPSCharacter::SetOverlappingWeapon(AWeapon* _Weapon)

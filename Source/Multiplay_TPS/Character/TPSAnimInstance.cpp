@@ -35,6 +35,8 @@ void UTPSAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	bIsCrouched = character->bIsCrouched;
 	bAiming = character->IsAiming();
 
+	turningInPlace = character->GetTurningInPlace();
+
 	// 스트레이핑
 	FRotator aimRotation = character->GetBaseAimRotation();
 	FRotator movementRotation = UKismetMathLibrary::MakeRotFromX(character->GetVelocity());

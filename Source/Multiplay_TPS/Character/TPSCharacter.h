@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Multiplay_TPS/TPSTypes/TurningInPlace.h"
 #include "TPSCharacter.generated.h"
 
 UCLASS()
@@ -48,24 +49,30 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	class UCombatComponent* combatComponent;
 
+	float ao_Yaw;
+	float ao_Pitch;
+	float interpAO_Yaw;
+	FRotator startAimRotation;
+
+	ETurningInPlace turningInPlace;
+
+private:
 	UFUNCTION(Server, Reliable)
 	void ServerEquipButtonPressed();
-	
+
 	UFUNCTION()
 	void OnRep_OverlappingWeapon(AWeapon* _LastWeapon);
 
-	float ao_Yaw;
-	float ao_Pitch;
-	FRotator startAimRotation;
-
+	void TurnInPlace(float DeltaTime);
 
 public:
 	void SetOverlappingWeapon(AWeapon* _Weapon);
 	bool IsWeaponEquipped();
 	bool IsAiming();
+	AWeapon* GetEquippedWeapon();
 
 public:
 	FORCEINLINE float GetAO_Yaw() const { return ao_Yaw; }
 	FORCEINLINE float GetAO_Pitch() const { return ao_Pitch; }
-	AWeapon* GetEquippedWeapon();
+	FORCEINLINE ETurningInPlace GetTurningInPlace() const { return turningInPlace; }
 };
