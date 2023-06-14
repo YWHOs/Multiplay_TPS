@@ -58,9 +58,11 @@ void UCombatComponent::OnRep_EquippedWeapon()
 void UCombatComponent::FirePressed(bool bPressed)
 {
 	bFirePressed = bPressed;
+	if (equippedWeapon == nullptr) return;
 	if (character && bFirePressed)
 	{
 		character->PlayFireMontage(bAiming);
+		equippedWeapon->Fire();
 	}
 }
 

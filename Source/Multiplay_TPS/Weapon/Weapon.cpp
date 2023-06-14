@@ -6,6 +6,8 @@
 #include "Components/WidgetComponent.h"
 #include "Multiplay_TPS/Character/TPSCharacter.h"
 #include "Net/UnrealNetwork.h"
+#include "Animation/AnimationAsset.h"
+#include "Components/SkeletalMeshComponent.h"
 
 // Sets default values
 AWeapon::AWeapon()
@@ -102,5 +104,13 @@ void AWeapon::ShowPickupWidget(bool _bShowWidget)
 	if (pickupWidget)
 	{
 		pickupWidget->SetVisibility(_bShowWidget);
+	}
+}
+
+void AWeapon::Fire()
+{
+	if (fireAnimation)
+	{
+		weaponMesh->PlayAnimation(fireAnimation, false);
 	}
 }
