@@ -58,14 +58,26 @@ void UCombatComponent::OnRep_EquippedWeapon()
 void UCombatComponent::FirePressed(bool bPressed)
 {
 	bFirePressed = bPressed;
+
+	if (bFirePressed)
+	{
+		ServerFire();
+	}
+}
+void UCombatComponent::ServerFire_Implementation()
+{
+	MulticastFire();
+}
+void UCombatComponent::MulticastFire_Implementation()
+{
+	// 모든 클라이언트에서 사용가능
 	if (equippedWeapon == nullptr) return;
-	if (character && bFirePressed)
+	if (character)
 	{
 		character->PlayFireMontage(bAiming);
 		equippedWeapon->Fire();
 	}
 }
-
 // Called every frame
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
