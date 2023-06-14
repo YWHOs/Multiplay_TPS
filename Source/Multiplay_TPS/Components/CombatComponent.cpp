@@ -55,6 +55,14 @@ void UCombatComponent::OnRep_EquippedWeapon()
 		character->bUseControllerRotationYaw = true;
 	}
 }
+void UCombatComponent::FirePressed(bool bPressed)
+{
+	bFirePressed = bPressed;
+	if (character && bFirePressed)
+	{
+		character->PlayFireMontage(bAiming);
+	}
+}
 
 // Called every frame
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

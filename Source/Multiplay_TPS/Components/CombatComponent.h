@@ -35,6 +35,8 @@ protected:
 	UFUNCTION()
 	void OnRep_EquippedWeapon();
 
+	void FirePressed(bool bPressed);
+
 private:
 	class ATPSCharacter* character;
 
@@ -48,6 +50,8 @@ private:
 	float baseWalkSpeed;
 	UPROPERTY(EditAnywhere)
 	float aimWalkSpeed;
+
+	bool bFirePressed;
 
 public:	
 	FORCEINLINE ATPSCharacter* GetCharacter() { return character; }

@@ -11,6 +11,7 @@
 #include "Multiplay_TPS/Components/CombatComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "TPSAnimInstance.h"
 
 ATPSCharacter::ATPSCharacter()
 {
@@ -76,6 +77,8 @@ void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &ATPSCharacter::CrouchPressed);
 	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &ATPSCharacter::AimPressed);
 	PlayerInputComponent->BindAction("Aim", IE_Released, this, &ATPSCharacter::AimReleased);
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ATPSCharacter::FirePressed);
+	PlayerInputComponent->BindAction("Fire", IE_Released, this, &ATPSCharacter::FireReleased);
 }
 
 void ATPSCharacter::PostInitializeComponents()
@@ -165,6 +168,33 @@ void ATPSCharacter::AimReleased()
 	if (combatComponent)
 	{
 		combatComponent->SetAiming(false);
+	}
+}
+void ATPSCharacter::FirePressed()
+{
+	if (combatComponent)
+	{
+		combatComponent->FirePressed(true);
+	}
+}
+void ATPSCharacter::FireReleased()
+{
+	if (combatComponent)
+	{
+		combatComponent->FirePressed(false);
+	}
+}
+void ATPSCharacter::PlayFireMontage(bool bAiming)
+{
+	if (combatComponent == nullptr || combatComponent->equippedWeapon == nullptr) return;
+
+	UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
+	if (animInstance && fireWeaponMontage)
+	{
+		animInstance->Montage_Play(fireWeaponMontage);
+		FName sectionName;
+		sectionName = bAiming ? FName("RifleAim") : FName("RifleHip");
+		animInstance->Montage_JumpToSection(sectionName);
 	}
 }
 void ATPSCharacter::AimOffset(float DeltaTime)

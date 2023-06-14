@@ -28,12 +28,15 @@ protected:
 	void AimReleased();
 	void AimOffset(float DeltaTime);
 	virtual void Jump() override;
+	void FirePressed();
+	void FireReleased();
 
 public:	
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PostInitializeComponents() override;
+	void PlayFireMontage(bool bAiming);
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
@@ -56,6 +59,9 @@ private:
 	FRotator startAimRotation;
 
 	ETurningInPlace turningInPlace;
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	class UAnimMontage* fireWeaponMontage;
 
 private:
 	UFUNCTION(Server, Reliable)
