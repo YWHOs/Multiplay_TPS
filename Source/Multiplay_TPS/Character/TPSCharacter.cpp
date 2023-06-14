@@ -37,6 +37,7 @@ ATPSCharacter::ATPSCharacter()
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+	GetCharacterMovement()->RotationRate = FRotator(0.f, 0.f, 900.f);
 	
 	turningInPlace = ETurningInPlace::ETIP_NotTurn;
 
@@ -64,7 +65,7 @@ void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ATPSCharacter::Jump);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &ATPSCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ATPSCharacter::MoveRight);
@@ -115,7 +116,17 @@ void ATPSCharacter::LookUp(float _value)
 {
 	AddControllerPitchInput(_value);
 }
-
+void ATPSCharacter::Jump()
+{
+	if (bIsCrouched)
+	{
+		UnCrouch();
+	}
+	else
+	{
+		Super::Jump();
+	}
+}
 void ATPSCharacter::EquipPressed()
 {
 	if (combatComponent)

@@ -27,6 +27,7 @@ protected:
 	void AimPressed();
 	void AimReleased();
 	void AimOffset(float DeltaTime);
+	virtual void Jump() override;
 
 public:	
 	virtual void Tick(float DeltaTime) override;
