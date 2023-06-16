@@ -8,11 +8,12 @@
 #include "Components/SphereComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values for this component's properties
 UCombatComponent::UCombatComponent()
 {
-	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bCanEverTick = true;
 
 	baseWalkSpeed = 600.f;
 	aimWalkSpeed = 450.f;
@@ -75,13 +76,50 @@ void UCombatComponent::MulticastFire_Implementation()
 	if (character)
 	{
 		character->PlayFireMontage(bAiming);
-		equippedWeapon->Fire();
+		equippedWeapon->Fire(hitTarget);
 	}
+}
+void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
+{
+	FVector2D viewportSize;
+	if (GEngine && GEngine->GameViewport)
+	{
+		GEngine->GameViewport->GetViewportSize(viewportSize);
+	}
+
+	FVector2D crosshairLocation(viewportSize.X / 2.f, viewportSize.Y / 2.f);
+	FVector crosshairWorldPos;
+	FVector crosshairWorldDirection;
+	bool bScreenToWorld = UGameplayStatics::DeprojectScreenToWorld(UGameplayStatics::GetPlayerController(this, 0), crosshairLocation, crosshairWorldPos, crosshairWorldDirection);
+
+	if (bScreenToWorld)
+	{
+		FVector start = crosshairWorldPos;
+
+		FVector end = start + crosshairWorldDirection * TRACE_LENGTH;
+
+		GetWorld()->LineTraceSingleByChannel(TraceHitResult, start, end, ECollisionChannel::ECC_Visibility);
+
+		if (!TraceHitResult.bBlockingHit)
+		{
+			TraceHitResult.ImpactPoint = end;
+			hitTarget = end;
+		}
+		else
+		{
+			hitTarget = TraceHitResult.ImpactPoint;
+		}
+	}
+
+
 }
 // Called every frame
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	FHitResult hitResult;
+	TraceUnderCrosshairs(hitResult);
 }
 void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
