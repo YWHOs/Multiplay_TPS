@@ -24,28 +24,28 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
 
-	void EquipWeapon(AWeapon* WeaponToEquip);
+	void EquipWeapon(AWeapon* _WeaponToEquip);
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
-	void SetAiming(bool bIsAiming);
+	void SetAiming(bool _bIsAiming);
 
 	UFUNCTION(Server, Reliable)
-	void ServerSetAiming(bool bIsAiming);
+	void ServerSetAiming(bool _bIsAiming);
 
 	UFUNCTION()
 	void OnRep_EquippedWeapon();
 
-	void FirePressed(bool bPressed);
+	void FirePressed(bool _bPressed);
 
 	UFUNCTION(Server, Reliable)
-	void ServerFire();
+	void ServerFire(const FVector_NetQuantize& _TraceHitTarget);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastFire();
+	void MulticastFire(const FVector_NetQuantize& _TraceHitTarget);
 
-	void TraceUnderCrosshairs(FHitResult& TraceHitResult);
+	void TraceUnderCrosshairs(FHitResult& _TraceHitResult);
 
 private:
 	class ATPSCharacter* character;
@@ -62,8 +62,6 @@ private:
 	float aimWalkSpeed;
 
 	bool bFirePressed;
-
-	FVector hitTarget;
 
 public:	
 	FORCEINLINE ATPSCharacter* GetCharacter() { return character; }

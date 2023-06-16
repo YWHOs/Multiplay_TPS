@@ -31,21 +31,21 @@ void UCombatComponent::BeginPlay()
 	}
 }
 
-void UCombatComponent::SetAiming(bool bIsAiming)
+void UCombatComponent::SetAiming(bool _bIsAiming)
 {
-	bAiming = bIsAiming;
-	ServerSetAiming(bIsAiming);
+	bAiming = _bIsAiming;
+	ServerSetAiming(_bIsAiming);
 	if (character)
 	{
-		character->GetCharacterMovement()->MaxWalkSpeed = bIsAiming ? aimWalkSpeed : baseWalkSpeed;
+		character->GetCharacterMovement()->MaxWalkSpeed = _bIsAiming ? aimWalkSpeed : baseWalkSpeed;
 	}
 }
-void UCombatComponent::ServerSetAiming_Implementation(bool bIsAiming)
+void UCombatComponent::ServerSetAiming_Implementation(bool _bIsAiming)
 {
-	bAiming = bIsAiming;
+	bAiming = _bIsAiming;
 	if (character)
 	{
-		character->GetCharacterMovement()->MaxWalkSpeed = bIsAiming ? aimWalkSpeed : baseWalkSpeed;
+		character->GetCharacterMovement()->MaxWalkSpeed = _bIsAiming ? aimWalkSpeed : baseWalkSpeed;
 	}
 }
 void UCombatComponent::OnRep_EquippedWeapon()
@@ -56,30 +56,32 @@ void UCombatComponent::OnRep_EquippedWeapon()
 		character->bUseControllerRotationYaw = true;
 	}
 }
-void UCombatComponent::FirePressed(bool bPressed)
+void UCombatComponent::FirePressed(bool _bPressed)
 {
-	bFirePressed = bPressed;
+	bFirePressed = _bPressed;
 
 	if (bFirePressed)
 	{
-		ServerFire();
+		FHitResult hitResult;
+		TraceUnderCrosshairs(hitResult);
+		ServerFire(hitResult.ImpactPoint);
 	}
 }
-void UCombatComponent::ServerFire_Implementation()
+void UCombatComponent::ServerFire_Implementation(const FVector_NetQuantize& _TraceHitTarget)
 {
-	MulticastFire();
+	MulticastFire(_TraceHitTarget);
 }
-void UCombatComponent::MulticastFire_Implementation()
+void UCombatComponent::MulticastFire_Implementation(const FVector_NetQuantize& _TraceHitTarget)
 {
 	// 모든 클라이언트에서 사용가능
 	if (equippedWeapon == nullptr) return;
 	if (character)
 	{
 		character->PlayFireMontage(bAiming);
-		equippedWeapon->Fire(hitTarget);
+		equippedWeapon->Fire(_TraceHitTarget);
 	}
 }
-void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
+void UCombatComponent::TraceUnderCrosshairs(FHitResult& _TraceHitResult)
 {
 	FVector2D viewportSize;
 	if (GEngine && GEngine->GameViewport)
@@ -98,17 +100,17 @@ void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
 
 		FVector end = start + crosshairWorldDirection * TRACE_LENGTH;
 
-		GetWorld()->LineTraceSingleByChannel(TraceHitResult, start, end, ECollisionChannel::ECC_Visibility);
+		GetWorld()->LineTraceSingleByChannel(_TraceHitResult, start, end, ECollisionChannel::ECC_Visibility);
 
-		if (!TraceHitResult.bBlockingHit)
-		{
-			TraceHitResult.ImpactPoint = end;
-			hitTarget = end;
-		}
-		else
-		{
-			hitTarget = TraceHitResult.ImpactPoint;
-		}
+		//if (!TraceHitResult.bBlockingHit)
+		//{
+		//	TraceHitResult.ImpactPoint = end;
+		//	hitTarget = end;
+		//}
+		//else
+		//{
+		//	hitTarget = TraceHitResult.ImpactPoint;
+		//}
 	}
 
 
@@ -117,9 +119,6 @@ void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	FHitResult hitResult;
-	TraceUnderCrosshairs(hitResult);
 }
 void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
@@ -129,11 +128,11 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(UCombatComponent, bAiming);
 }
 
-void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
+void UCombatComponent::EquipWeapon(AWeapon* _WeaponToEquip)
 {
-	if (character == nullptr || WeaponToEquip == nullptr) return;
+	if (character == nullptr || _WeaponToEquip == nullptr) return;
 
-	equippedWeapon = WeaponToEquip;
+	equippedWeapon = _WeaponToEquip;
 	equippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
 	const USkeletalMeshSocket* handSocket = character->GetMesh()->GetSocketByName(FName("RightHandSocket"));
 	if (handSocket)
