@@ -7,6 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Particles/ParticleSystem.h"
+#include "Sound/SoundCue.h"
 
 AProjectile::AProjectile()
 {
@@ -35,8 +36,15 @@ void AProjectile::BeginPlay()
 	{
 		tracerComponent = UGameplayStatics::SpawnEmitterAttached(tracer, collisionBox, FName(), GetActorLocation(), GetActorRotation(), EAttachLocation::KeepWorldPosition);
 	}
+	if (HasAuthority())
+	{
+		collisionBox->OnComponentHit.AddDynamic(this, &AProjectile::OnHit);
+	}
 }
-
+void AProjectile::OnHit(UPrimitiveComponent* _HitComp, AActor* _OtherActor, UPrimitiveComponent* _OtherComp, FVector _NormalImpulse, const FHitResult& _Hit)
+{
+	Destroy();
+}
 // Called every frame
 void AProjectile::Tick(float DeltaTime)
 {
@@ -44,3 +52,16 @@ void AProjectile::Tick(float DeltaTime)
 
 }
 
+void AProjectile::Destroyed()
+{
+	Super::Destroyed();
+
+	if (impactParticle)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), impactParticle, GetActorTransform());
+	}
+	if (impactSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, impactSound, GetActorLocation());
+	}
+}

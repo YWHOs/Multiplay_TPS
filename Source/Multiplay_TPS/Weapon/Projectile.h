@@ -14,14 +14,17 @@ class MULTIPLAY_TPS_API AProjectile : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AProjectile();
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+	virtual void Destroyed() override;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	UFUNCTION()
+	virtual void OnHit(UPrimitiveComponent* _HitComp, AActor* _OtherActor, UPrimitiveComponent* _OtherComp, FVector _NormalImpulse, const FHitResult& _Hit);
+
 
 private:
 	UPROPERTY(EditAnywhere)
@@ -35,4 +38,9 @@ private:
 
 	class UParticleSystemComponent* tracerComponent;
 
+	UPROPERTY(EditAnywhere)
+	UParticleSystem* impactParticle;
+
+	UPROPERTY(EditAnywhere)
+	class USoundCue* impactSound;
 };
