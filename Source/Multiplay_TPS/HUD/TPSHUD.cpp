@@ -13,25 +13,32 @@ void ATPSHUD::DrawHUD()
 		GEngine->GameViewport->GetViewportSize(viewSize);
 		const FVector2D viewportCenter(viewSize.X / 2.f, viewSize.Y / 2.f);
 
+		float spreadScaled = spreadMax * HUDPackage.crosshairSpread;
+
 		if (HUDPackage.crosshairCenter)
 		{
-			DrawCrosshair(HUDPackage.crosshairCenter, viewportCenter);
+			FVector2D spread(0.f, 0.f);
+			DrawCrosshair(HUDPackage.crosshairCenter, viewportCenter, spread);
 		}
 		if (HUDPackage.crosshairLeft)
 		{
-			DrawCrosshair(HUDPackage.crosshairLeft, viewportCenter);
+			FVector2D spread(-spreadScaled, 0.f);
+			DrawCrosshair(HUDPackage.crosshairLeft, viewportCenter, spread);
 		}
 		if (HUDPackage.crosshairRight)
 		{
-			DrawCrosshair(HUDPackage.crosshairRight, viewportCenter);
+			FVector2D spread(spreadScaled, 0.f);
+			DrawCrosshair(HUDPackage.crosshairRight, viewportCenter, spread);
 		}
 		if (HUDPackage.crosshairTop)
 		{
-			DrawCrosshair(HUDPackage.crosshairTop, viewportCenter);
+			FVector2D spread(0.f, -spreadScaled);
+			DrawCrosshair(HUDPackage.crosshairTop, viewportCenter, spread);
 		}
 		if (HUDPackage.crosshairBottom)
 		{
-			DrawCrosshair(HUDPackage.crosshairBottom, viewportCenter);
+			FVector2D spread(0.f, spreadScaled);
+			DrawCrosshair(HUDPackage.crosshairBottom, viewportCenter, spread);
 		}
 		else
 		{
@@ -40,11 +47,11 @@ void ATPSHUD::DrawHUD()
 	}
 }
 
-void ATPSHUD::DrawCrosshair(UTexture2D* _Texture, FVector2D _ViewportCenter)
+void ATPSHUD::DrawCrosshair(UTexture2D* _Texture, FVector2D _ViewportCenter, FVector2D _Spread)
 {
 	const float textureWidth = _Texture->GetSizeX();
 	const float textureHeight = _Texture->GetSizeY();
-	const FVector2D textureDrawPoint(_ViewportCenter.X - (textureWidth / 2.f), _ViewportCenter.Y - (textureHeight / 2.f));
+	const FVector2D textureDrawPoint(_ViewportCenter.X - (textureWidth / 2.f) + _Spread.X, _ViewportCenter.Y - (textureHeight / 2.f) + _Spread.Y);
 
 	DrawTexture(_Texture, textureDrawPoint.X, textureDrawPoint.Y, textureWidth, textureHeight, 0.f, 0.f, 1.f, 1.f, FLinearColor::White);
 }

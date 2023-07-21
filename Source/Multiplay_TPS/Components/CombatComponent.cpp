@@ -68,6 +68,27 @@ void UCombatComponent::SetHUDCrosshairs(float _DeltaTime)
 				HUDPackage.crosshairTop = nullptr;
 				HUDPackage.crosshairBottom = nullptr;
 			}
+			// 크로스헤어 늘리기
+
+			FVector2D walkRange(0.f, character->GetCharacterMovement()->MaxWalkSpeed);
+			FVector2D velocityMultiplierRange(0.f, 1.f);
+			FVector velocity = character->GetVelocity();
+			velocity.Z = 0.f;
+
+			crosshairVelocity = FMath::GetMappedRangeValueClamped(walkRange, velocityMultiplierRange, velocity.Size());
+
+			// 크로스헤어(점프 시)
+			if (character->GetCharacterMovement()->IsFalling())
+			{
+				crosshairInAir = FMath::FInterpTo(crosshairInAir, 2.25f, _DeltaTime, 2.25f);
+			}
+			else
+			{
+				crosshairInAir = FMath::FInterpTo(crosshairInAir, 0.f, _DeltaTime, 30.f);
+			}
+
+			HUDPackage.crosshairSpread = crosshairVelocity + crosshairInAir;
+
 			HUD->SetHUDPackage(HUDPackage);
 		}
 	}

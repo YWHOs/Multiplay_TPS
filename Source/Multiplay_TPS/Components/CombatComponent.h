@@ -67,6 +67,10 @@ private:
 
 	bool bFirePressed;
 
+	//crosshair
+	float crosshairVelocity;
+	float crosshairInAir;
+
 public:	
 	FORCEINLINE ATPSCharacter* GetCharacter() { return character; }
 
