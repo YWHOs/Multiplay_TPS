@@ -19,9 +19,20 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UFUNCTION()
+	virtual void OnHit(UPrimitiveComponent* _HitComp, AActor* _OtherActor, UPrimitiveComponent* _OtherComp, FVector _NormalImpulse, const FHitResult& _Hit);
+
 private:
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* meshComp;
+
+	UPROPERTY(EditAnywhere)
+	float ejectionImpulse;
+
+	UPROPERTY(EditAnywhere)
+	class USoundCue* shellSound;
+private:
+
 
 
 };

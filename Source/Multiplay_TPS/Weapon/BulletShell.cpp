@@ -2,6 +2,8 @@
 
 
 #include "BulletShell.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
 
 // Sets default values
 ABulletShell::ABulletShell()
@@ -11,6 +13,11 @@ ABulletShell::ABulletShell()
 
 	meshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComponent"));
 	SetRootComponent(meshComp);
+	meshComp->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+	meshComp->SetSimulatePhysics(true);
+	meshComp->SetEnableGravity(true);
+	meshComp->SetNotifyRigidBodyCollision(true);
+	ejectionImpulse = 10.f;
 }
 
 // Called when the game starts or when spawned
@@ -18,5 +25,16 @@ void ABulletShell::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	meshComp->OnComponentHit.AddDynamic(this, &ABulletShell::OnHit);
+	meshComp->AddImpulse(GetActorForwardVector() * ejectionImpulse);
 }
 
+UFUNCTION()
+void ABulletShell::OnHit(UPrimitiveComponent* _HitComp, AActor* _OtherActor, UPrimitiveComponent* _OtherComp, FVector _NormalImpulse, const FHitResult& _Hit)
+{
+	if (shellSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, shellSound, GetActorLocation());
+	}
+	Destroy();
+}
