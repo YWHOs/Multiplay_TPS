@@ -63,6 +63,7 @@ private:
 	UPROPERTY(EditAnywhere, Category = Combat)
 	class UAnimMontage* fireWeaponMontage;
 
+
 private:
 	UFUNCTION(Server, Reliable)
 	void ServerEquipButtonPressed();

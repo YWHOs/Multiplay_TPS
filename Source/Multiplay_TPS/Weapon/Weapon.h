@@ -8,6 +8,7 @@
 
 class USphereComponent;
 class UWidgetComponent;
+class UTexture2D;
 
 UENUM(BlueprintType)
 enum class EWeaponState : uint8
@@ -32,6 +33,19 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	void ShowPickupWidget(bool _bShowWidget);
 	virtual void Fire(const FVector& HitTarget);
+
+public:
+	// Texture Crosshairs
+	UPROPERTY(EditAnywhere, Category = Crosshairs)
+	UTexture2D* crosshairCenter;
+	UPROPERTY(EditAnywhere, Category = Crosshairs)
+	UTexture2D* crosshairLeft;
+	UPROPERTY(EditAnywhere, Category = Crosshairs)
+	UTexture2D* crosshairRight;
+	UPROPERTY(EditAnywhere, Category = Crosshairs)
+	UTexture2D* crosshairTop;
+	UPROPERTY(EditAnywhere, Category = Crosshairs)
+	UTexture2D* crosshairBottom;
 
 protected:
 	// Called when the game starts or when spawned
