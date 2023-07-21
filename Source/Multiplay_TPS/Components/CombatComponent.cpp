@@ -26,7 +26,7 @@ UCombatComponent::UCombatComponent()
 void UCombatComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	if (character)
 	{
 		character->GetCharacterMovement()->MaxWalkSpeed = baseWalkSpeed;
