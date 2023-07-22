@@ -63,5 +63,14 @@ void UTPSAnimInstance::NativeUpdateAnimation(float DeltaTime)
 		character->GetMesh()->TransformToBoneSpace(FName("hand_r"), lefthandTransform.GetLocation(), FRotator::ZeroRotator, outPos, outRot);
 		lefthandTransform.SetLocation(outPos);
 		lefthandTransform.SetRotation(FQuat(outRot));
+
+		// 총구의 위치와 크로스헤어 중앙의 위치를 Rotate 시키기
+		if (character->IsLocallyControlled())
+		{
+			bLocallyControlled = true;
+			FTransform rightHandTransform = equippedWeapon->GetWeaponMesh()->GetSocketTransform(FName("Hand_R"), ERelativeTransformSpace::RTS_World);
+			rightHandRotation = UKismetMathLibrary::FindLookAtRotation(rightHandTransform.GetLocation(), rightHandTransform.GetLocation() + (rightHandTransform.GetLocation() - character->GetHitTarget()));
+		}
+
 	}
 }

@@ -71,6 +71,8 @@ private:
 	float crosshairVelocity;
 	float crosshairInAir;
 
+	FVector hitTarget;
+
 public:	
 	FORCEINLINE ATPSCharacter* GetCharacter() { return character; }
 

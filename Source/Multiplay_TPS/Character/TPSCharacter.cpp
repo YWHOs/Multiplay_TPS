@@ -307,3 +307,9 @@ AWeapon* ATPSCharacter::GetEquippedWeapon()
 	if (combatComponent == nullptr) return nullptr;
 	return combatComponent->equippedWeapon;
 }
+
+FVector ATPSCharacter::GetHitTarget() const
+{
+	if (combatComponent == nullptr) return FVector();
+	return combatComponent->hitTarget;
+}

@@ -78,6 +78,7 @@ public:
 	bool IsWeaponEquipped();
 	bool IsAiming();
 	AWeapon* GetEquippedWeapon();
+	FVector GetHitTarget() const;
 
 public:
 	FORCEINLINE float GetAO_Yaw() const { return ao_Yaw; }
