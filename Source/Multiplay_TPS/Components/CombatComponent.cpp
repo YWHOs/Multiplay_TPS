@@ -10,7 +10,6 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Multiplay_TPS/PlayerController/TPSPlayerController.h"
-#include "Multiplay_TPS/HUD/TPSHUD.h"
 #include "Camera/CameraComponent.h"
 
 // Sets default values for this component's properties
@@ -86,7 +85,6 @@ void UCombatComponent::SetHUDCrosshairs(float _DeltaTime)
 		HUD = HUD == nullptr ? Cast<ATPSHUD>(controller->GetHUD()) : HUD;
 		if (HUD)
 		{
-			FHUDPackage HUDPackage;
 			if (equippedWeapon)
 			{
 				HUDPackage.crosshairCenter = equippedWeapon->crosshairCenter;
@@ -217,16 +215,17 @@ void UCombatComponent::TraceUnderCrosshairs(FHitResult& _TraceHitResult)
 
 		GetWorld()->LineTraceSingleByChannel(_TraceHitResult, start, end, ECollisionChannel::ECC_Visibility);
 
-		//if (!TraceHitResult.bBlockingHit)
-		//{
-		//	TraceHitResult.ImpactPoint = end;
-		//	hitTarget = end;
-		//}
-		//else
-		//{
-		//	hitTarget = TraceHitResult.ImpactPoint;
-		//}
+		// Actor 발견시 크로스헤어 색 변경
+		if (_TraceHitResult.GetActor() && _TraceHitResult.GetActor()->Implements<UInteractCrosshair_Interface>())
+		{
+			HUDPackage.crosshairColor = FLinearColor::Red;
+		}
+		else
+		{
+			HUDPackage.crosshairColor = FLinearColor::White;
+		}
 	}
+
 
 
 }

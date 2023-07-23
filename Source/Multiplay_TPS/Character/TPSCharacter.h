@@ -5,10 +5,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Multiplay_TPS/TPSTypes/TurningInPlace.h"
+#include "Multiplay_TPS/Interface/InteractCrosshair_Interface.h"
 #include "TPSCharacter.generated.h"
 
 UCLASS()
-class MULTIPLAY_TPS_API ATPSCharacter : public ACharacter
+class MULTIPLAY_TPS_API ATPSCharacter : public ACharacter, public IInteractCrosshair_Interface
 {
 	GENERATED_BODY()
 
