@@ -11,6 +11,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Multiplay_TPS/PlayerController/TPSPlayerController.h"
 #include "Multiplay_TPS/HUD/TPSHUD.h"
+#include "Camera/CameraComponent.h"
 
 // Sets default values for this component's properties
 UCombatComponent::UCombatComponent()
@@ -30,6 +31,12 @@ void UCombatComponent::BeginPlay()
 	if (character)
 	{
 		character->GetCharacterMovement()->MaxWalkSpeed = baseWalkSpeed;
+
+		if (character->GetFollowCamera())
+		{
+			defaultFOV = character->GetFollowCamera()->FieldOfView;
+			currentFOV = defaultFOV;
+		}
 	}
 }
 // Called every frame
@@ -37,15 +44,35 @@ void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	SetHUDCrosshairs(DeltaTime);
-
 	if (character && character->IsLocallyControlled())
 	{
 		FHitResult hitResult;
 		TraceUnderCrosshairs(hitResult);
 		hitTarget = hitResult.ImpactPoint;
+
+		SetHUDCrosshairs(DeltaTime);
+		//Zoom
+		InterpFOV(DeltaTime);
 	}
 
+}
+void UCombatComponent::InterpFOV(float _DeltaTime)
+{
+	if (equippedWeapon == nullptr) return;
+
+	if (bAiming)
+	{
+		currentFOV = FMath::FInterpTo(currentFOV, equippedWeapon->GetZoomed(), _DeltaTime, equippedWeapon->GetInterpSpeed());
+	}
+	else
+	{
+		currentFOV = FMath::FInterpTo(currentFOV, defaultFOV, _DeltaTime, zoomInterpSpeed);
+	}
+
+	if (character && character->GetFollowCamera())
+	{
+		character->GetFollowCamera()->SetFieldOfView(currentFOV);
+	}
 }
 
 void UCombatComponent::SetHUDCrosshairs(float _DeltaTime)

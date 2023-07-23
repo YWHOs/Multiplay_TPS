@@ -73,6 +73,20 @@ private:
 
 	FVector hitTarget;
 
+	//Aim
+	float defaultFOV;
+
+	UPROPERTY(EditAnywhere)
+	float zoomFOV = 30.f;
+
+	float currentFOV;
+
+	UPROPERTY(EditAnywhere)
+	float zoomInterpSpeed = 20.f;
+
+private:
+	void InterpFOV(float _DeltaTime);
+
 public:	
 	FORCEINLINE ATPSCharacter* GetCharacter() { return character; }
 
