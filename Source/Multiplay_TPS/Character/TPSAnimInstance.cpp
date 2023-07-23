@@ -70,7 +70,7 @@ void UTPSAnimInstance::NativeUpdateAnimation(float DeltaTime)
 			bLocallyControlled = true;
 			FTransform rightHandTransform = equippedWeapon->GetWeaponMesh()->GetSocketTransform(FName("hand_r"), ERelativeTransformSpace::RTS_World);
 			FRotator lookAtRotation = UKismetMathLibrary::FindLookAtRotation(rightHandTransform.GetLocation(), rightHandTransform.GetLocation() + (rightHandTransform.GetLocation() - character->GetHitTarget()));
-			rightHandRotation = FMath::RInterpTo(rightHandRotation, lookAtRotation, DeltaTime, 30.f)
+			rightHandRotation = FMath::RInterpTo(rightHandRotation, lookAtRotation, DeltaTime, 30.f);
 		}
 
 	}

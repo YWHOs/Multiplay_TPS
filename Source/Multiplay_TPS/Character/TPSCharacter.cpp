@@ -81,6 +81,27 @@ void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ATPSCharacter::FirePressed);
 	PlayerInputComponent->BindAction("Fire", IE_Released, this, &ATPSCharacter::FireReleased);
 }
+void ATPSCharacter::HideCamera()
+{
+	// 플레이어가 물체에 가까우면 카메라 숨기기
+	if (!IsLocallyControlled()) return;
+	if ((followCamera->GetComponentLocation() - GetActorLocation()).Size() < cameraThreshold)
+	{
+		GetMesh()->SetVisibility(false);
+		if (combatComponent && combatComponent->equippedWeapon && combatComponent->equippedWeapon->GetWeaponMesh())
+		{
+			combatComponent->equippedWeapon->GetWeaponMesh()->bOwnerNoSee = true;
+		}
+	}
+	else
+	{
+		GetMesh()->SetVisibility(true);
+		if (combatComponent && combatComponent->equippedWeapon && combatComponent->equippedWeapon->GetWeaponMesh())
+		{
+			combatComponent->equippedWeapon->GetWeaponMesh()->bOwnerNoSee = false;
+		}
+	}
+}
 
 void ATPSCharacter::PostInitializeComponents()
 {
