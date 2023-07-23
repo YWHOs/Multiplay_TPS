@@ -112,17 +112,27 @@ void UCombatComponent::SetHUDCrosshairs(float _DeltaTime)
 
 			crosshairVelocity = FMath::GetMappedRangeValueClamped(walkRange, velocityMultiplierRange, velocity.Size());
 
+			float interpSpeed = 30.f;
 			// 크로스헤어(점프 시)
 			if (character->GetCharacterMovement()->IsFalling())
 			{
-				crosshairInAir = FMath::FInterpTo(crosshairInAir, 2.25f, _DeltaTime, 2.25f);
+				crosshairInAir = FMath::FInterpTo(crosshairInAir, 2.25f, _DeltaTime, interpSpeed);
 			}
 			else
 			{
-				crosshairInAir = FMath::FInterpTo(crosshairInAir, 0.f, _DeltaTime, 30.f);
+				crosshairInAir = FMath::FInterpTo(crosshairInAir, 0.f, _DeltaTime, interpSpeed);
 			}
-
-			HUDPackage.crosshairSpread = crosshairVelocity + crosshairInAir;
+			// 크로스헤어 (조준 시)
+			if (bAiming)
+			{
+				crosshairAim = FMath::FInterpTo(crosshairAim, 0.6f, _DeltaTime, interpSpeed);
+			}
+			else
+			{
+				crosshairAim = FMath::FInterpTo(crosshairAim, 0.f, _DeltaTime, interpSpeed);
+			}
+			crosshairShooting = FMath::FInterpTo(crosshairShooting, 0.f, _DeltaTime, interpSpeed);
+			HUDPackage.crosshairSpread = crosshairVelocity + crosshairInAir - crosshairAim + crosshairShooting + 0.5f;
 
 			HUD->SetHUDPackage(HUDPackage);
 		}
@@ -164,6 +174,12 @@ void UCombatComponent::FirePressed(bool _bPressed)
 		FHitResult hitResult;
 		TraceUnderCrosshairs(hitResult);
 		ServerFire(hitResult.ImpactPoint);
+
+		if (equippedWeapon)
+		{
+			float shootValue = 0.6f;
+			crosshairShooting = shootValue;
+		}
 	}
 }
 void UCombatComponent::ServerFire_Implementation(const FVector_NetQuantize& _TraceHitTarget)

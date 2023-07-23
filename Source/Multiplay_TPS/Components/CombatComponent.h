@@ -70,6 +70,8 @@ private:
 	//crosshair
 	float crosshairVelocity;
 	float crosshairInAir;
+	float crosshairAim;
+	float crosshairShooting;
 
 	FVector hitTarget;
 
