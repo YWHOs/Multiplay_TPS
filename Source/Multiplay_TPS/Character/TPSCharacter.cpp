@@ -12,6 +12,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "TPSAnimInstance.h"
+#include "Multiplay_TPS/Multiplay_TPS.h"
 
 ATPSCharacter::ATPSCharacter()
 {
@@ -37,6 +38,7 @@ ATPSCharacter::ATPSCharacter()
 
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+	GetMesh()->SetCollisionObjectType(ECC_SkeletalMesh);
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 0.f, 900.f);
@@ -218,6 +220,23 @@ void ATPSCharacter::PlayFireMontage(bool bAiming)
 		sectionName = bAiming ? FName("RifleAim") : FName("RifleHip");
 		animInstance->Montage_JumpToSection(sectionName);
 	}
+}
+void ATPSCharacter::PlayHitReactMontage()
+{
+	if (combatComponent == nullptr || combatComponent->equippedWeapon == nullptr) return;
+
+	UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
+	if (animInstance && hitReactMontage)
+	{
+		animInstance->Montage_Play(hitReactMontage);
+		FName sectionName("FromFront");
+		animInstance->Montage_JumpToSection(sectionName);
+	}
+}
+void ATPSCharacter::MulticastHit_Implementation()
+{
+	// 서버와 클라 둘 다 호출
+	PlayHitReactMontage();
 }
 void ATPSCharacter::AimOffset(float DeltaTime)
 {

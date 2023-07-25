@@ -8,6 +8,8 @@
 #include "Multiplay_TPS/Interface/InteractCrosshair_Interface.h"
 #include "TPSCharacter.generated.h"
 
+class UAnimMontage;
+
 UCLASS()
 class MULTIPLAY_TPS_API ATPSCharacter : public ACharacter, public IInteractCrosshair_Interface
 {
@@ -31,6 +33,7 @@ protected:
 	virtual void Jump() override;
 	void FirePressed();
 	void FireReleased();
+	void PlayHitReactMontage();
 
 public:	
 	virtual void Tick(float DeltaTime) override;
@@ -38,6 +41,8 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PostInitializeComponents() override;
 	void PlayFireMontage(bool bAiming);
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastHit();
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
@@ -62,7 +67,10 @@ private:
 	ETurningInPlace turningInPlace;
 
 	UPROPERTY(EditAnywhere, Category = Combat)
-	class UAnimMontage* fireWeaponMontage;
+	UAnimMontage* fireWeaponMontage;
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	UAnimMontage* hitReactMontage;
 
 	UPROPERTY(EditAnywhere)
 	float cameraThreshold = 200.f;
