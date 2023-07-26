@@ -30,6 +30,8 @@ protected:
 	void AimPressed();
 	void AimReleased();
 	void AimOffset(float DeltaTime);
+	void CalculateAOPitch();
+	void SimProxiesTurn();
 	virtual void Jump() override;
 	void FirePressed();
 	void FireReleased();
@@ -43,6 +45,8 @@ public:
 	void PlayFireMontage(bool bAiming);
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastHit();
+
+	virtual void OnRep_ReplicatedMovement() override;
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
@@ -75,6 +79,16 @@ private:
 	UPROPERTY(EditAnywhere)
 	float cameraThreshold = 200.f;
 
+	float turnThreshold = 0.5f;
+
+	// 부드러운 회전
+	FRotator proxyRotationLast;
+	FRotator proxyRotation;
+	float proxyYaw;
+	float lastMovementReplication;
+
+	bool bRotateRootBone;
+
 private:
 	UFUNCTION(Server, Reliable)
 	void ServerEquipButtonPressed();
@@ -83,8 +97,9 @@ private:
 	void OnRep_OverlappingWeapon(AWeapon* _LastWeapon);
 
 	void TurnInPlace(float DeltaTime);
-
 	void HideCamera();
+
+	float CalculateSpeed();
 
 public:
 	void SetOverlappingWeapon(AWeapon* _Weapon);
@@ -98,4 +113,5 @@ public:
 	FORCEINLINE float GetAO_Pitch() const { return ao_Pitch; }
 	FORCEINLINE ETurningInPlace GetTurningInPlace() const { return turningInPlace; }
 	FORCEINLINE UCameraComponent* GetFollowCamera() const { return followCamera; }
+	FORCEINLINE bool ShouldRotateRootBone() const { return bRotateRootBone; }
 };

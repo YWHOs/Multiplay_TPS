@@ -63,7 +63,20 @@ void ATPSCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	AimOffset(DeltaTime);
+	if (GetLocalRole() > ENetRole::ROLE_SimulatedProxy && IsLocallyControlled())
+	{
+		AimOffset(DeltaTime);
+	}
+	else
+	{
+		lastMovementReplication += DeltaTime;
+		if (lastMovementReplication > 0.25f)
+		{
+			OnRep_ReplicatedMovement();
+		}
+		CalculateAOPitch();
+	}
+	HideCamera();
 }
 void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -238,18 +251,22 @@ void ATPSCharacter::MulticastHit_Implementation()
 	// 서버와 클라 둘 다 호출
 	PlayHitReactMontage();
 }
+float ATPSCharacter::CalculateSpeed()
+{
+	FVector velocity = GetVelocity();
+	velocity.Z = 0.f;
+	return velocity.Size();
+}
 void ATPSCharacter::AimOffset(float DeltaTime)
 {
 	if (combatComponent && combatComponent->equippedWeapon == nullptr) return;
-
-	FVector velocity = GetVelocity();
-	velocity.Z = 0.f;
-	float speed = velocity.Size();
+	float speed = CalculateSpeed();
 	bool bIsAir = GetCharacterMovement()->IsFalling();
 
 	// 멈추거나, 점프X
 	if (speed == 0.f && !bIsAir)
 	{
+		bRotateRootBone = true;
 		FRotator currentAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
 		FRotator deltaAimRotation = UKismetMathLibrary::NormalizedDeltaRotator(currentAimRotation, startAimRotation);
 		ao_Yaw = deltaAimRotation.Yaw;
@@ -264,6 +281,7 @@ void ATPSCharacter::AimOffset(float DeltaTime)
 	// 달리거나, 점프
 	if (speed > 0.f || bIsAir)
 	{
+		bRotateRootBone = false;
 		startAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
 		ao_Yaw = 0.f;
 		bUseControllerRotationYaw = true;
@@ -271,6 +289,10 @@ void ATPSCharacter::AimOffset(float DeltaTime)
 		turningInPlace = ETurningInPlace::ETIP_NotTurn;
 	}
 
+	CalculateAOPitch();
+}
+void ATPSCharacter::CalculateAOPitch()
+{
 	ao_Pitch = GetBaseAimRotation().Pitch;
 	if (ao_Pitch > 90.f && !IsLocallyControlled())
 	{
@@ -279,6 +301,49 @@ void ATPSCharacter::AimOffset(float DeltaTime)
 		FVector2D outRange(-90.f, 0.f);
 		ao_Pitch = FMath::GetMappedRangeValueClamped(inRange, outRange, ao_Pitch);
 	}
+}
+void ATPSCharacter::SimProxiesTurn()
+{
+	// 부드러운 회전 계산
+	if (combatComponent == nullptr || combatComponent->equippedWeapon == nullptr) return;
+	bRotateRootBone = false;
+	float speed = CalculateSpeed();
+	if (speed > 0.f)
+	{
+		turningInPlace = ETurningInPlace::ETIP_NotTurn;
+		return;
+	}
+
+	proxyRotationLast = proxyRotation;
+	proxyRotation = GetActorRotation();
+	proxyYaw = UKismetMathLibrary::NormalizedDeltaRotator(proxyRotation, proxyRotationLast).Yaw;
+
+	if (FMath::Abs(proxyYaw) > turnThreshold)
+	{
+		if (proxyYaw > turnThreshold)
+		{
+			turningInPlace = ETurningInPlace::ETIP_Right;
+		}
+		else if (proxyYaw < -turnThreshold)
+		{
+			turningInPlace = ETurningInPlace::ETIP_Left;
+		}
+		else
+		{
+			turningInPlace = ETurningInPlace::ETIP_NotTurn;
+		}
+		return;
+	}
+	turningInPlace = ETurningInPlace::ETIP_NotTurn;
+}
+void ATPSCharacter::OnRep_ReplicatedMovement()
+{
+	Super::OnRep_ReplicatedMovement();
+	if (GetLocalRole() == ENetRole::ROLE_SimulatedProxy)
+	{
+		SimProxiesTurn();
+	}
+	lastMovementReplication = 0.f;
 }
 void ATPSCharacter::TurnInPlace(float DeltaTime)
 {
