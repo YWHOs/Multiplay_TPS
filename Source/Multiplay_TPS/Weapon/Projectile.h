@@ -25,6 +25,9 @@ protected:
 	UFUNCTION()
 	virtual void OnHit(UPrimitiveComponent* _HitComp, AActor* _OtherActor, UPrimitiveComponent* _OtherComp, FVector _NormalImpulse, const FHitResult& _Hit);
 
+protected:
+	UPROPERTY(EditAnywhere)
+	float damage = 10.f;
 
 private:
 	UPROPERTY(EditAnywhere)
@@ -43,4 +46,5 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	class USoundCue* impactSound;
+
 };

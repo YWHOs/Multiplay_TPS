@@ -21,6 +21,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	void UpdateHUDHealth();
 	void MoveForward(float _value);
 	void MoveRight(float _value);
 	void Turn(float _value);
@@ -36,6 +37,8 @@ protected:
 	void FirePressed();
 	void FireReleased();
 	void PlayHitReactMontage();
+	UFUNCTION()
+	void ReceiveDamage(AActor* _DamagedActor, float _Damage, const UDamageType* _DamageType, class AController* _InstigatorController, AActor* _DamageCauser);
 
 public:	
 	virtual void Tick(float DeltaTime) override;
@@ -43,8 +46,6 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PostInitializeComponents() override;
 	void PlayFireMontage(bool bAiming);
-	UFUNCTION(NetMulticast, Unreliable)
-	void MulticastHit();
 
 	virtual void OnRep_ReplicatedMovement() override;
 

@@ -46,11 +46,6 @@ void AProjectile::BeginPlay()
 }
 void AProjectile::OnHit(UPrimitiveComponent* _HitComp, AActor* _OtherActor, UPrimitiveComponent* _OtherComp, FVector _NormalImpulse, const FHitResult& _Hit)
 {
-	ATPSCharacter* character = Cast<ATPSCharacter>(_OtherActor);
-	if (character)
-	{
-		character->MulticastHit();
-	}
 	Destroy();
 }
 // Called every frame

@@ -60,7 +60,15 @@ void ATPSCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	TPSController = Cast<ATPSPlayerController>(Controller);
+	UpdateHUDHealth();
+	if (HasAuthority())
+	{
+		OnTakeAnyDamage.AddDynamic(this, &ATPSCharacter::ReceiveDamage);
+	}
+}
+void ATPSCharacter::UpdateHUDHealth()
+{
+	TPSController = TPSController == nullptr ? Cast<ATPSPlayerController>(Controller) : TPSController;
 	if (TPSController)
 	{
 		TPSController->SetHUDHealth(health, maxHealth);
@@ -253,11 +261,7 @@ void ATPSCharacter::PlayHitReactMontage()
 		animInstance->Montage_JumpToSection(sectionName);
 	}
 }
-void ATPSCharacter::MulticastHit_Implementation()
-{
-	// 서버와 클라 둘 다 호출
-	PlayHitReactMontage();
-}
+
 float ATPSCharacter::CalculateSpeed()
 {
 	FVector velocity = GetVelocity();
@@ -409,7 +413,14 @@ void ATPSCharacter::OnRep_OverlappingWeapon(AWeapon* _LastWeapon)
 }
 void ATPSCharacter::OnRep_Health()
 {
-
+	UpdateHUDHealth();
+	PlayHitReactMontage();
+}
+void ATPSCharacter::ReceiveDamage(AActor* _DamagedActor, float _Damage, const UDamageType* _DamageType, class AController* _InstigatorController, AActor* _DamageCauser)
+{
+	health = FMath::Clamp(health - _Damage, 0.f, maxHealth);
+	UpdateHUDHealth();
+	PlayHitReactMontage();
 }
 bool ATPSCharacter::IsWeaponEquipped()
 {
