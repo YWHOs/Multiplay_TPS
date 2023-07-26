@@ -11,6 +11,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Multiplay_TPS/PlayerController/TPSPlayerController.h"
 #include "Camera/CameraComponent.h"
+#include "TimerManager.h"
 
 // Sets default values for this component's properties
 UCombatComponent::UCombatComponent()
@@ -163,22 +164,43 @@ void UCombatComponent::OnRep_EquippedWeapon()
 	}
 }
 
+void UCombatComponent::StartFireTimer()
+{
+	if (equippedWeapon == nullptr || character == nullptr) return;
+	character->GetWorldTimerManager().SetTimer(fireTimer, this, &UCombatComponent::FireTimerFinish, equippedWeapon->fireDelay);
+}
+void UCombatComponent::FireTimerFinish()
+{
+	if (equippedWeapon == nullptr) return;
+	bCanFire = true;
+	if (bFirePressed && equippedWeapon->bAutomatic)
+	{
+		Fire();
+	}
+}
 void UCombatComponent::FirePressed(bool _bPressed)
 {
 	bFirePressed = _bPressed;
 
 	if (bFirePressed)
 	{
-		FHitResult hitResult;
-		TraceUnderCrosshairs(hitResult);
-		ServerFire(hitResult.ImpactPoint);
-
+		Fire();
+	}
+}
+void UCombatComponent::Fire()
+{
+	if (bCanFire)
+	{
+		ServerFire(hitTarget);
 		if (equippedWeapon)
 		{
+			bCanFire = false;
 			float shootValue = 0.6f;
 			crosshairShooting = shootValue;
 		}
+		StartFireTimer();
 	}
+
 }
 void UCombatComponent::ServerFire_Implementation(const FVector_NetQuantize& _TraceHitTarget)
 {

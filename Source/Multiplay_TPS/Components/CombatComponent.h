@@ -40,6 +40,8 @@ protected:
 
 	void FirePressed(bool _bPressed);
 
+	void Fire();
+
 	UFUNCTION(Server, Reliable)
 	void ServerFire(const FVector_NetQuantize& _TraceHitTarget);
 
@@ -80,17 +82,22 @@ private:
 
 	//Aim
 	float defaultFOV;
-
 	UPROPERTY(EditAnywhere)
 	float zoomFOV = 30.f;
-
 	float currentFOV;
-
 	UPROPERTY(EditAnywhere)
 	float zoomInterpSpeed = 20.f;
 
+	// 자동사격
+	FTimerHandle fireTimer;
+	UPROPERTY(VisibleAnywhere)
+	bool bCanFire = true;
+
 private:
 	void InterpFOV(float _DeltaTime);
+
+	void StartFireTimer();
+	void FireTimerFinish();
 
 public:	
 	FORCEINLINE ATPSCharacter* GetCharacter() { return character; }

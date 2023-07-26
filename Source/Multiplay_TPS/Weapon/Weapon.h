@@ -50,9 +50,14 @@ public:
 	//Zoom
 	UPROPERTY(EditAnywhere)
 	float zoomed = 30.f;
-
 	UPROPERTY(EditAnywhere)
 	float zoomInterpSpeed = 20.f;
+
+	// 자동사격
+	UPROPERTY(EditAnywhere)
+	float fireDelay = .15f;
+	UPROPERTY(EditAnywhere)
+	bool bAutomatic = true;
 
 protected:
 	// Called when the game starts or when spawned
