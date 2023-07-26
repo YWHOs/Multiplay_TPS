@@ -2,7 +2,23 @@
 
 
 #include "TPSHUD.h"
+#include "CharacterOverlay.h"
 
+void ATPSHUD::BeginPlay()
+{
+	Super::BeginPlay();
+
+	AddCharacterOverlay();
+}
+void ATPSHUD::AddCharacterOverlay()
+{
+	APlayerController* playerController = GetOwningPlayerController();
+	if (playerController && characterOverlayClass)
+	{
+		characterOverlay = CreateWidget<UCharacterOverlay>(playerController, characterOverlayClass);
+		characterOverlay->AddToViewport();
+	}
+}
 void ATPSHUD::DrawHUD()
 {
 	Super::DrawHUD();

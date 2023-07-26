@@ -89,6 +89,14 @@ private:
 
 	bool bRotateRootBone;
 
+	// Health
+	UPROPERTY(EditAnywhere, Category = "Stat")
+	float maxHealth = 100.f;
+	UPROPERTY(ReplicatedUsing = OnRep_Health, VisibleAnywhere, Category = "Stat")
+	float health = 100.f;
+
+	class ATPSPlayerController* TPSController;
+
 private:
 	UFUNCTION(Server, Reliable)
 	void ServerEquipButtonPressed();
@@ -100,6 +108,9 @@ private:
 	void HideCamera();
 
 	float CalculateSpeed();
+
+	UFUNCTION()
+	void OnRep_Health();
 
 public:
 	void SetOverlappingWeapon(AWeapon* _Weapon);

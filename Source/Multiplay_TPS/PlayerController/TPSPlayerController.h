@@ -9,9 +9,21 @@
 /**
  * 
  */
+class ATPSHUD;
+
 UCLASS()
 class MULTIPLAY_TPS_API ATPSPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 	
+public:
+	void SetHUDHealth(float _Health, float _MaxHealth);
+
+
+protected:
+	virtual void BeginPlay() override;
+
+private:
+	ATPSHUD* TPSHUD;
+
 };

@@ -13,6 +13,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "TPSAnimInstance.h"
 #include "Multiplay_TPS/Multiplay_TPS.h"
+#include "Multiplay_TPS/PlayerController/TPSPlayerController.h"
 
 ATPSCharacter::ATPSCharacter()
 {
@@ -53,11 +54,17 @@ void ATPSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(ATPSCharacter, overlappingWeapon, COND_OwnerOnly);
+	DOREPLIFETIME(ATPSCharacter, health);
 }
 void ATPSCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	TPSController = Cast<ATPSPlayerController>(Controller);
+	if (TPSController)
+	{
+		TPSController->SetHUDHealth(health, maxHealth);
+	}
 }
 void ATPSCharacter::Tick(float DeltaTime)
 {
@@ -399,6 +406,10 @@ void ATPSCharacter::OnRep_OverlappingWeapon(AWeapon* _LastWeapon)
 	{
 		_LastWeapon->ShowPickupWidget(false);
 	}
+}
+void ATPSCharacter::OnRep_Health()
+{
+
 }
 bool ATPSCharacter::IsWeaponEquipped()
 {

@@ -8,6 +8,7 @@
 
 
 class UTexture2D;
+class UCharacterOverlay;
 
 USTRUCT(BlueprintType)
 struct FHUDPackage
@@ -35,6 +36,15 @@ class MULTIPLAY_TPS_API ATPSHUD : public AHUD
 	
 public:
 	virtual void DrawHUD() override;
+
+public:
+	UPROPERTY(EditAnywhere, Category = "Stat")
+	TSubclassOf<class UUserWidget> characterOverlayClass;
+	UCharacterOverlay* characterOverlay;
+
+protected:
+	virtual void BeginPlay() override;
+	void AddCharacterOverlay();
 
 private:
 	FHUDPackage HUDPackage;
