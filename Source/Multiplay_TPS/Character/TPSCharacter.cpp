@@ -15,6 +15,7 @@
 #include "Multiplay_TPS/Multiplay_TPS.h"
 #include "Multiplay_TPS/PlayerController/TPSPlayerController.h"
 #include "Multiplay_TPS/TPSGameMode.h"
+#include "TimerManager.h"
 
 ATPSCharacter::ATPSCharacter()
 {
@@ -443,11 +444,25 @@ void ATPSCharacter::PlayElimMontage()
 		animInstance->Montage_Play(elimMontage);
 	}
 }
-void ATPSCharacter::Elim_Implementation()
+void ATPSCharacter::Elim()
+{
+	MulticastElim();
+	GetWorldTimerManager().SetTimer(elimTimer, this, &ATPSCharacter::ElimTimerFinish, elimDelay);
+}
+void ATPSCharacter::MulticastElim_Implementation()
 {
 	bElimmed = true;
 	PlayElimMontage();
 }
+void ATPSCharacter::ElimTimerFinish()
+{
+	ATPSGameMode* gameMode = GetWorld()->GetAuthGameMode<ATPSGameMode>();
+	if (gameMode)
+	{
+		gameMode->RequestRespawn(this, Controller);
+	}
+}
+
 bool ATPSCharacter::IsWeaponEquipped()
 {
 	return (combatComponent && combatComponent->equippedWeapon);

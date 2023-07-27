@@ -20,4 +20,5 @@ class MULTIPLAY_TPS_API ATPSGameMode : public AGameMode
 
 public:
 	virtual void PlayerEliminated(ATPSCharacter* _ElimCharacter, ATPSPlayerController* _VictimController, ATPSPlayerController* _AttackController);
+	virtual void RequestRespawn(ACharacter* _ElimCharacter, AController* _ElimController);
 };

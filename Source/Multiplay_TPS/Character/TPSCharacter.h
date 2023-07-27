@@ -48,8 +48,9 @@ public:
 	void PlayFireMontage(bool bAiming);
 	void PlayElimMontage();
 	virtual void OnRep_ReplicatedMovement() override;
-	UFUNCTION(NetMulticast, Reliable)
 	void Elim();
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastElim();
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
@@ -101,6 +102,11 @@ private:
 	class ATPSPlayerController* TPSController;
 	bool bElimmed = false;
 
+	FTimerHandle elimTimer;
+	UPROPERTY(EditDefaultsOnly)
+	float elimDelay = 3.f;
+
+
 private:
 	UFUNCTION(Server, Reliable)
 	void ServerEquipButtonPressed();
@@ -115,6 +121,8 @@ private:
 
 	UFUNCTION()
 	void OnRep_Health();
+
+	void ElimTimerFinish();
 
 public:
 	void SetOverlappingWeapon(AWeapon* _Weapon);
