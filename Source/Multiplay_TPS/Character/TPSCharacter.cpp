@@ -14,6 +14,7 @@
 #include "TPSAnimInstance.h"
 #include "Multiplay_TPS/Multiplay_TPS.h"
 #include "Multiplay_TPS/PlayerController/TPSPlayerController.h"
+#include "Multiplay_TPS/TPSGameMode.h"
 
 ATPSCharacter::ATPSCharacter()
 {
@@ -421,6 +422,31 @@ void ATPSCharacter::ReceiveDamage(AActor* _DamagedActor, float _Damage, const UD
 	health = FMath::Clamp(health - _Damage, 0.f, maxHealth);
 	UpdateHUDHealth();
 	PlayHitReactMontage();
+
+	if (health == 0.f)
+	{
+		ATPSGameMode* gameMode = GetWorld()->GetAuthGameMode<ATPSGameMode>();
+		if (gameMode)
+		{
+			TPSController = TPSController == nullptr ? Cast<ATPSPlayerController>(Controller) : TPSController;
+			ATPSPlayerController* attackController = Cast<ATPSPlayerController>(_InstigatorController);
+			gameMode->PlayerEliminated(this, TPSController, attackController);
+		}
+	}
+
+}
+void ATPSCharacter::PlayElimMontage()
+{
+	UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
+	if (animInstance && elimMontage)
+	{
+		animInstance->Montage_Play(elimMontage);
+	}
+}
+void ATPSCharacter::Elim_Implementation()
+{
+	bElimmed = true;
+	PlayElimMontage();
 }
 bool ATPSCharacter::IsWeaponEquipped()
 {

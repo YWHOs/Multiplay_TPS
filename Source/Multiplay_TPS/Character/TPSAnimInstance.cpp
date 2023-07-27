@@ -37,6 +37,7 @@ void UTPSAnimInstance::NativeUpdateAnimation(float DeltaTime)
 
 	turningInPlace = character->GetTurningInPlace();
 	bRotateRootBone = character->ShouldRotateRootBone();
+	bElimmed = character->IsElimmed();
 
 	// 스트레이핑
 	FRotator aimRotation = character->GetBaseAimRotation();

@@ -46,8 +46,10 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PostInitializeComponents() override;
 	void PlayFireMontage(bool bAiming);
-
+	void PlayElimMontage();
 	virtual void OnRep_ReplicatedMovement() override;
+	UFUNCTION(NetMulticast, Reliable)
+	void Elim();
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
@@ -73,13 +75,13 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Combat)
 	UAnimMontage* fireWeaponMontage;
-
 	UPROPERTY(EditAnywhere, Category = Combat)
 	UAnimMontage* hitReactMontage;
+	UPROPERTY(EditAnywhere, Category = Combat)
+	UAnimMontage* elimMontage;
 
 	UPROPERTY(EditAnywhere)
 	float cameraThreshold = 200.f;
-
 	float turnThreshold = 0.5f;
 
 	// 부드러운 회전
@@ -97,6 +99,7 @@ private:
 	float health = 100.f;
 
 	class ATPSPlayerController* TPSController;
+	bool bElimmed = false;
 
 private:
 	UFUNCTION(Server, Reliable)
@@ -126,4 +129,5 @@ public:
 	FORCEINLINE ETurningInPlace GetTurningInPlace() const { return turningInPlace; }
 	FORCEINLINE UCameraComponent* GetFollowCamera() const { return followCamera; }
 	FORCEINLINE bool ShouldRotateRootBone() const { return bRotateRootBone; }
+	FORCEINLINE bool IsElimmed() const { return bElimmed; }
 };
