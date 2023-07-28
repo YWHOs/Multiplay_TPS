@@ -448,6 +448,10 @@ void ATPSCharacter::PlayElimMontage()
 }
 void ATPSCharacter::Elim()
 {
+	if (combatComponent && combatComponent->equippedWeapon)
+	{
+		combatComponent->equippedWeapon->Dropped();
+	}
 	MulticastElim();
 	GetWorldTimerManager().SetTimer(elimTimer, this, &ATPSCharacter::ElimTimerFinish, elimDelay);
 }
@@ -456,6 +460,7 @@ void ATPSCharacter::MulticastElim_Implementation()
 	bElimmed = true;
 	PlayElimMontage();
 
+	// Á×´Â ÀÌÆåÆ®
 	if (instanceDissolve)
 	{
 		dynamicInstanceDissolve = UMaterialInstanceDynamic::Create(instanceDissolve, this);
@@ -464,6 +469,15 @@ void ATPSCharacter::MulticastElim_Implementation()
 		dynamicInstanceDissolve->SetScalarParameterValue(TEXT("Glow"), 200.f);
 	}
 	StartDissolve();
+
+	GetCharacterMovement()->DisableMovement();
+	GetCharacterMovement()->StopMovementImmediately();
+	if (TPSController)
+	{
+		DisableInput(TPSController);
+	}
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 void ATPSCharacter::ElimTimerFinish()
 {
