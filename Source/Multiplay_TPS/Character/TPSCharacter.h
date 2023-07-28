@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Multiplay_TPS/TPSTypes/TurningInPlace.h"
 #include "Multiplay_TPS/Interface/InteractCrosshair_Interface.h"
+#include "Components/TimelineComponent.h"
 #include "TPSCharacter.generated.h"
 
 class UAnimMontage;
@@ -51,6 +52,12 @@ public:
 	void Elim();
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastElim();
+
+	void SetOverlappingWeapon(AWeapon* _Weapon);
+	bool IsWeaponEquipped();
+	bool IsAiming();
+	AWeapon* GetEquippedWeapon();
+	FVector GetHitTarget() const;
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
@@ -105,7 +112,16 @@ private:
 	FTimerHandle elimTimer;
 	UPROPERTY(EditDefaultsOnly)
 	float elimDelay = 3.f;
-
+	// Effect
+	UPROPERTY(VisibleAnywhere)
+	UTimelineComponent* dissolveTimeline;
+	FOnTimelineFloat dissolveTrack;
+	UPROPERTY(EditAnywhere)
+	UCurveFloat* dissolveCurve;
+	UPROPERTY(VisibleAnywhere)
+	UMaterialInstanceDynamic* dynamicInstanceDissolve;
+	UPROPERTY(EditAnywhere)
+	UMaterialInstance* instanceDissolve;
 
 private:
 	UFUNCTION(Server, Reliable)
@@ -123,13 +139,11 @@ private:
 	void OnRep_Health();
 
 	void ElimTimerFinish();
+	UFUNCTION()
+	void UpdateDissolve(float _Value);
+	void StartDissolve();
 
-public:
-	void SetOverlappingWeapon(AWeapon* _Weapon);
-	bool IsWeaponEquipped();
-	bool IsAiming();
-	AWeapon* GetEquippedWeapon();
-	FVector GetHitTarget() const;
+
 
 public:
 	FORCEINLINE float GetAO_Yaw() const { return ao_Yaw; }

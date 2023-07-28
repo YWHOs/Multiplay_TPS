@@ -50,6 +50,8 @@ ATPSCharacter::ATPSCharacter()
 
 	NetUpdateFrequency = 66.f;
 	MinNetUpdateFrequency = 33.f;
+
+	dissolveTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("DissolveTimeline"));
 }
 void ATPSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
@@ -453,6 +455,15 @@ void ATPSCharacter::MulticastElim_Implementation()
 {
 	bElimmed = true;
 	PlayElimMontage();
+
+	if (instanceDissolve)
+	{
+		dynamicInstanceDissolve = UMaterialInstanceDynamic::Create(instanceDissolve, this);
+		GetMesh()->SetMaterial(0, dynamicInstanceDissolve);
+		dynamicInstanceDissolve->SetScalarParameterValue(TEXT("Dissolve"), 0.55f);
+		dynamicInstanceDissolve->SetScalarParameterValue(TEXT("Glow"), 200.f);
+	}
+	StartDissolve();
 }
 void ATPSCharacter::ElimTimerFinish()
 {
@@ -462,7 +473,22 @@ void ATPSCharacter::ElimTimerFinish()
 		gameMode->RequestRespawn(this, Controller);
 	}
 }
-
+void ATPSCharacter::UpdateDissolve(float _Value)
+{
+	if (dynamicInstanceDissolve)
+	{
+		dynamicInstanceDissolve->SetScalarParameterValue(TEXT("Dissolve"), _Value);
+	}
+}
+void ATPSCharacter::StartDissolve()
+{
+	dissolveTrack.BindDynamic(this, &ATPSCharacter::UpdateDissolve); 
+	if (dissolveCurve && dissolveTimeline)
+	{
+		dissolveTimeline->AddInterpFloat(dissolveCurve, dissolveTrack);
+		dissolveTimeline->Play();
+	}
+}
 bool ATPSCharacter::IsWeaponEquipped()
 {
 	return (combatComponent && combatComponent->equippedWeapon);
