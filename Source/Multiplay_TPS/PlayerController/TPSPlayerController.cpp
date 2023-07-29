@@ -36,3 +36,14 @@ void ATPSPlayerController::SetHUDHealth(float _Health, float _MaxHealth)
 		TPSHUD->characterOverlay->healthText->SetText(FText::FromString(healthText));
 	}
 }
+
+void ATPSPlayerController::SetHUDScore(float _Score)
+{
+	TPSHUD = TPSHUD == nullptr ? Cast<ATPSHUD>(GetHUD()) : TPSHUD;
+	bool bValid = TPSHUD && TPSHUD->characterOverlay && TPSHUD->characterOverlay->scoreAmountText;
+	if (bValid)
+	{
+		FString scoreText = FString::Printf(TEXT("%d"), FMath::FloorToInt(_Score));
+		TPSHUD->characterOverlay->scoreAmountText->SetText(FText::FromString(scoreText));
+	}
+}

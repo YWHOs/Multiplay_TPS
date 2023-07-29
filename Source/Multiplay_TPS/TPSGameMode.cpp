@@ -6,9 +6,17 @@
 #include "Multiplay_TPS/PlayerController/TPSPlayerController.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerStart.h"
+#include "Multiplay_TPS/PlayerState/TPSPlayerState.h"
 
 void ATPSGameMode::PlayerEliminated(ATPSCharacter* _ElimCharacter, ATPSPlayerController* _VictimController, ATPSPlayerController* _AttackController)
 {
+	ATPSPlayerState* attackerState = _AttackController ? Cast<ATPSPlayerState>(_AttackController->PlayerState) : nullptr;
+	ATPSPlayerState* victimState = _VictimController ? Cast<ATPSPlayerState>(_VictimController->PlayerState) : nullptr;
+
+	if (attackerState && attackerState != victimState)
+	{
+		attackerState->AddToScore(1.f);
+	}
 	if (_ElimCharacter)
 	{
 		_ElimCharacter->Elim();

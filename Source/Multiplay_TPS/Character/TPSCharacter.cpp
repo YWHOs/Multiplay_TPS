@@ -19,6 +19,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "Multiplay_TPS/PlayerState/TPSPlayerState.h"
 
 ATPSCharacter::ATPSCharacter()
 {
@@ -62,6 +63,17 @@ void ATPSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 
 	DOREPLIFETIME_CONDITION(ATPSCharacter, overlappingWeapon, COND_OwnerOnly);
 	DOREPLIFETIME(ATPSCharacter, health);
+}
+void ATPSCharacter::TickInit()
+{
+	if (playerState == nullptr)
+	{
+		playerState = GetPlayerState<ATPSPlayerState>();
+		if (playerState)
+		{
+			playerState->AddToScore(0.f);
+		}
+	}
 }
 void ATPSCharacter::BeginPlay()
 {
@@ -108,6 +120,7 @@ void ATPSCharacter::Tick(float DeltaTime)
 		CalculateAOPitch();
 	}
 	HideCamera();
+	TickInit();
 }
 void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {

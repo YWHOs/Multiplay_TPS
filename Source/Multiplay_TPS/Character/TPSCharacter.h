@@ -11,6 +11,7 @@
 
 class UAnimMontage;
 class USoundCue;
+class ATPSPlayerState;
 
 UCLASS()
 class MULTIPLAY_TPS_API ATPSCharacter : public ACharacter, public IInteractCrosshair_Interface
@@ -41,6 +42,7 @@ protected:
 	void PlayHitReactMontage();
 	UFUNCTION()
 	void ReceiveDamage(AActor* _DamagedActor, float _Damage, const UDamageType* _DamageType, class AController* _InstigatorController, AActor* _DamageCauser);
+	void TickInit();
 
 public:	
 	virtual void Tick(float DeltaTime) override;
@@ -131,6 +133,8 @@ private:
 	UParticleSystemComponent* elimBotComponent;
 	UPROPERTY(EditAnywhere)
 	USoundCue* elimBotSound;
+
+	ATPSPlayerState* playerState;
 
 private:
 	UFUNCTION(Server, Reliable)
