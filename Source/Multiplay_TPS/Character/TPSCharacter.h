@@ -161,4 +161,6 @@ public:
 	FORCEINLINE UCameraComponent* GetFollowCamera() const { return followCamera; }
 	FORCEINLINE bool ShouldRotateRootBone() const { return bRotateRootBone; }
 	FORCEINLINE bool IsElimmed() const { return bElimmed; }
+	FORCEINLINE float GetHealth() const { return health; }
+	FORCEINLINE float GetMaxHealth() const { return maxHealth; }
 };

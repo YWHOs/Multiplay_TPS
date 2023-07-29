@@ -18,6 +18,7 @@ class MULTIPLAY_TPS_API ATPSPlayerController : public APlayerController
 	
 public:
 	void SetHUDHealth(float _Health, float _MaxHealth);
+	virtual void OnPossess(APawn* _Pawn) override;
 
 
 protected:

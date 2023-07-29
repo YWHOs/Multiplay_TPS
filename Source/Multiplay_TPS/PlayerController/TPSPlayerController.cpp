@@ -6,6 +6,7 @@
 #include "Multiplay_TPS/HUD/CharacterOverlay.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
+#include "Multiplay_TPS/Character/TPSCharacter.h"
 
 void ATPSPlayerController::BeginPlay()
 {
@@ -13,7 +14,16 @@ void ATPSPlayerController::BeginPlay()
 
 	TPSHUD = Cast<ATPSHUD>(GetHUD());
 }
+void ATPSPlayerController::OnPossess(APawn* _Pawn)
+{
+	Super::OnPossess(_Pawn);
 
+	ATPSCharacter* character = Cast<ATPSCharacter>(_Pawn);
+	if (character)
+	{
+		SetHUDHealth(character->GetHealth(), character->GetMaxHealth());
+	}
+}
 void ATPSPlayerController::SetHUDHealth(float _Health, float _MaxHealth)
 {
 	TPSHUD = TPSHUD == nullptr ? Cast<ATPSHUD>(GetHUD()) : TPSHUD;
