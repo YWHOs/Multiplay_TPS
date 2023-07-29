@@ -10,6 +10,7 @@
 #include "TPSCharacter.generated.h"
 
 class UAnimMontage;
+class USoundCue;
 
 UCLASS()
 class MULTIPLAY_TPS_API ATPSCharacter : public ACharacter, public IInteractCrosshair_Interface
@@ -58,6 +59,8 @@ public:
 	bool IsAiming();
 	AWeapon* GetEquippedWeapon();
 	FVector GetHitTarget() const;
+
+	virtual void Destroyed() override;
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
@@ -122,6 +125,12 @@ private:
 	UMaterialInstanceDynamic* dynamicInstanceDissolve;
 	UPROPERTY(EditAnywhere)
 	UMaterialInstance* instanceDissolve;
+	UPROPERTY(EditAnywhere)
+	UParticleSystem* elimBotEffect;
+	UPROPERTY(VisibleAnywhere)
+	UParticleSystemComponent* elimBotComponent;
+	UPROPERTY(EditAnywhere)
+	USoundCue* elimBotSound;
 
 private:
 	UFUNCTION(Server, Reliable)

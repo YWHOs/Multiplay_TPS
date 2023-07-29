@@ -16,6 +16,9 @@
 #include "Multiplay_TPS/PlayerController/TPSPlayerController.h"
 #include "Multiplay_TPS/TPSGameMode.h"
 #include "TimerManager.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
+#include "Particles/ParticleSystemComponent.h"
 
 ATPSCharacter::ATPSCharacter()
 {
@@ -68,6 +71,15 @@ void ATPSCharacter::BeginPlay()
 	if (HasAuthority())
 	{
 		OnTakeAnyDamage.AddDynamic(this, &ATPSCharacter::ReceiveDamage);
+	}
+}
+void ATPSCharacter::Destroyed()
+{
+	Super::Destroyed();
+
+	if (elimBotComponent)
+	{
+		elimBotComponent->DestroyComponent();
 	}
 }
 void ATPSCharacter::UpdateHUDHealth()
@@ -470,6 +482,7 @@ void ATPSCharacter::MulticastElim_Implementation()
 	}
 	StartDissolve();
 
+	// Input Collision Disable
 	GetCharacterMovement()->DisableMovement();
 	GetCharacterMovement()->StopMovementImmediately();
 	if (TPSController)
@@ -478,6 +491,17 @@ void ATPSCharacter::MulticastElim_Implementation()
 	}
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	// Spawn
+	if (elimBotEffect)
+	{
+		FVector elimBotSpawn(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z + 200.f);
+		elimBotComponent = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), elimBotEffect, elimBotSpawn, GetActorRotation());
+	}
+	if (elimBotSound)
+	{
+		UGameplayStatics::SpawnSoundAtLocation(this, elimBotSound, GetActorLocation());
+	}
 }
 void ATPSCharacter::ElimTimerFinish()
 {
