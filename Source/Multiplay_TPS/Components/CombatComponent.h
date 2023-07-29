@@ -53,8 +53,11 @@ protected:
 	void SetHUDCrosshairs(float _DeltaTime);
 
 private:
+	UPROPERTY()
 	class ATPSCharacter* character;
+	UPROPERTY()
 	class ATPSPlayerController* controller;
+	UPROPERTY()
 	class ATPSHUD* HUD;
 
 	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon)

@@ -66,12 +66,13 @@ void ATPSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 }
 void ATPSCharacter::TickInit()
 {
-	if (playerState == nullptr)
+	if (TPSPlayerState == nullptr)
 	{
-		playerState = GetPlayerState<ATPSPlayerState>();
-		if (playerState)
+		TPSPlayerState = GetPlayerState<ATPSPlayerState>();
+		if (TPSPlayerState)
 		{
-			playerState->AddToScore(0.f);
+			TPSPlayerState->AddToScore(0.f);
+			TPSPlayerState->AddToDie(0);
 		}
 	}
 }

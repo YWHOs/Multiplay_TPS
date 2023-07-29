@@ -12,6 +12,7 @@
 class UAnimMontage;
 class USoundCue;
 class ATPSPlayerState;
+class ATPSPlayerController;
 
 UCLASS()
 class MULTIPLAY_TPS_API ATPSCharacter : public ACharacter, public IInteractCrosshair_Interface
@@ -111,7 +112,8 @@ private:
 	UPROPERTY(ReplicatedUsing = OnRep_Health, VisibleAnywhere, Category = "Stat")
 	float health = 100.f;
 
-	class ATPSPlayerController* TPSController;
+	UPROPERTY()
+	ATPSPlayerController* TPSController;
 	bool bElimmed = false;
 
 	FTimerHandle elimTimer;
@@ -133,8 +135,8 @@ private:
 	UParticleSystemComponent* elimBotComponent;
 	UPROPERTY(EditAnywhere)
 	USoundCue* elimBotSound;
-
-	ATPSPlayerState* playerState;
+	UPROPERTY()
+	ATPSPlayerState* TPSPlayerState;
 
 private:
 	UFUNCTION(Server, Reliable)

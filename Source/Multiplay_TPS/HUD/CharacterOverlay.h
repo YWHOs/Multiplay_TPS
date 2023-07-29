@@ -28,4 +28,6 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* scoreAmountText;
 
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* dieAmountText;
 };

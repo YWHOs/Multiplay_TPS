@@ -4,21 +4,41 @@
 #include "TPSPlayerState.h"
 #include "Multiplay_TPS/Character/TPSCharacter.h"
 #include "Multiplay_TPS/PlayerController/TPSPlayerController.h"
+#include "Net/UnrealNetwork.h"
 
+void ATPSPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	//UnrealNetwork
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ATPSPlayerState, die);
+}
 void ATPSPlayerState::AddToScore(float _Score)
 {
-	Score += _Score;
+	SetScore(GetScore() + _Score);
 	character = character == nullptr ? Cast<ATPSCharacter>(GetPawn()) : character;
 	if (character)
 	{
 		playerController = playerController == nullptr ? Cast<ATPSPlayerController>(character->Controller) : playerController;
 		if (playerController)
 		{
-			playerController->SetHUDScore(Score);
+			playerController->SetHUDScore(GetScore());
 		}
 	}
 }
-
+void ATPSPlayerState::AddToDie(int32 _Die)
+{
+	die += _Die;
+	character = character == nullptr ? Cast<ATPSCharacter>(GetPawn()) : character;
+	if (character)
+	{
+		playerController = playerController == nullptr ? Cast<ATPSPlayerController>(character->Controller) : playerController;
+		if (playerController)
+		{
+			playerController->SetHUDDie(die);
+		}
+	}
+}
 void ATPSPlayerState::OnRep_Score()
 {
 	Super::OnRep_Score();
@@ -29,7 +49,19 @@ void ATPSPlayerState::OnRep_Score()
 		playerController = playerController == nullptr ? Cast<ATPSPlayerController>(character->Controller) : playerController;
 		if (playerController)
 		{
-			playerController->SetHUDScore(Score);
+			playerController->SetHUDScore(GetScore());
+		}
+	}
+}
+void ATPSPlayerState::OnRep_Die()
+{
+	character = character == nullptr ? Cast<ATPSCharacter>(GetPawn()) : character;
+	if (character)
+	{
+		playerController = playerController == nullptr ? Cast<ATPSPlayerController>(character->Controller) : playerController;
+		if (playerController)
+		{
+			playerController->SetHUDDie(die);
 		}
 	}
 }

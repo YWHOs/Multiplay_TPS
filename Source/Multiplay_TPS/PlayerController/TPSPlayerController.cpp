@@ -47,3 +47,14 @@ void ATPSPlayerController::SetHUDScore(float _Score)
 		TPSHUD->characterOverlay->scoreAmountText->SetText(FText::FromString(scoreText));
 	}
 }
+
+void ATPSPlayerController::SetHUDDie(int32 _Die)
+{
+	TPSHUD = TPSHUD == nullptr ? Cast<ATPSHUD>(GetHUD()) : TPSHUD;
+	bool bValid = TPSHUD && TPSHUD->characterOverlay && TPSHUD->characterOverlay->dieAmountText;
+	if (bValid)
+	{
+		FString dieText = FString::Printf(TEXT("%d"), _Die);
+		TPSHUD->characterOverlay->dieAmountText->SetText(FText::FromString(dieText));
+	}
+}

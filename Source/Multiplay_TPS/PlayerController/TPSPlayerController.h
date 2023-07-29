@@ -19,6 +19,7 @@ class MULTIPLAY_TPS_API ATPSPlayerController : public APlayerController
 public:
 	void SetHUDHealth(float _Health, float _MaxHealth);
 	void SetHUDScore(float _Score);
+	void SetHUDDie(int32 _Die);
 	virtual void OnPossess(APawn* _Pawn) override;
 
 
@@ -26,6 +27,7 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
+	UPROPERTY()
 	ATPSHUD* TPSHUD;
 
 };

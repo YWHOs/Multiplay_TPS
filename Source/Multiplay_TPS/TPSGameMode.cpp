@@ -17,6 +17,10 @@ void ATPSGameMode::PlayerEliminated(ATPSCharacter* _ElimCharacter, ATPSPlayerCon
 	{
 		attackerState->AddToScore(1.f);
 	}
+	if (victimState)
+	{
+		victimState->AddToDie(1);
+	}
 	if (_ElimCharacter)
 	{
 		_ElimCharacter->Elim();
