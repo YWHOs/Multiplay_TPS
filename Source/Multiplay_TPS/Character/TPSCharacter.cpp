@@ -483,6 +483,10 @@ void ATPSCharacter::Elim()
 }
 void ATPSCharacter::MulticastElim_Implementation()
 {
+	if (TPSController)
+	{
+		TPSController->SetHUDAmmo(0);
+	}
 	bElimmed = true;
 	PlayElimMontage();
 

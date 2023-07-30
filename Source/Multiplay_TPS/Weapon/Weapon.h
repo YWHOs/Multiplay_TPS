@@ -9,6 +9,8 @@
 class USphereComponent;
 class UWidgetComponent;
 class UTexture2D;
+class ATPSCharacter;
+class ATPSPlayerController;
 
 UENUM(BlueprintType)
 enum class EWeaponState : uint8
@@ -31,6 +33,8 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void OnRep_Owner() override;
+	void SetHUDAmmo();
 	void ShowPickupWidget(bool _bShowWidget);
 	virtual void Fire(const FVector& HitTarget);
 	void Dropped();
@@ -88,9 +92,23 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class ABulletShell> bulletClass;
 
+	UPROPERTY(EditAnywhere, ReplicatedUsing = OnRep_Ammo)
+	int32 ammo;
+	UPROPERTY(EditAnywhere)
+	int32 magCapacity;
+
+	UPROPERTY()
+	ATPSCharacter* TPSCharacter;
+	UPROPERTY()
+	ATPSPlayerController* TPSPlayerController;
 private:
 	UFUNCTION()
 	void OnRep_WeaponState();
+
+	UFUNCTION()
+	void OnRep_Ammo();
+
+	void SpendRound();
 public:
 	void SetWeaponState(EWeaponState State);
 	FORCEINLINE USphereComponent* GetAreaSphere() const { return areaSphere; }

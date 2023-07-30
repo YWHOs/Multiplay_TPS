@@ -20,6 +20,7 @@ public:
 	void SetHUDHealth(float _Health, float _MaxHealth);
 	void SetHUDScore(float _Score);
 	void SetHUDDie(int32 _Die);
+	void SetHUDAmmo(int32 _Ammo);
 	virtual void OnPossess(APawn* _Pawn) override;
 
 

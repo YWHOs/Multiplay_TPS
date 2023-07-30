@@ -58,3 +58,14 @@ void ATPSPlayerController::SetHUDDie(int32 _Die)
 		TPSHUD->characterOverlay->dieAmountText->SetText(FText::FromString(dieText));
 	}
 }
+
+void ATPSPlayerController::SetHUDAmmo(int32 _Ammo)
+{
+	TPSHUD = TPSHUD == nullptr ? Cast<ATPSHUD>(GetHUD()) : TPSHUD;
+	bool bValid = TPSHUD && TPSHUD->characterOverlay && TPSHUD->characterOverlay->ammoAmountText;
+	if (bValid)
+	{
+		FString ammoText = FString::Printf(TEXT("%d"), _Ammo);
+		TPSHUD->characterOverlay->ammoAmountText->SetText(FText::FromString(ammoText));
+	}
+}

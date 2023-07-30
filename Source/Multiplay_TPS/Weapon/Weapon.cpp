@@ -10,6 +10,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "BulletShell.h"
 #include "Engine/SkeletalMeshSocket.h"
+#include "Multiplay_TPS/PlayerController/TPSPlayerController.h"
 
 // Sets default values
 AWeapon::AWeapon()
@@ -63,6 +64,7 @@ void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AWeapon, weaponState);
+	DOREPLIFETIME(AWeapon, ammo);
 }
 void AWeapon::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OhterComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
@@ -121,6 +123,41 @@ void AWeapon::OnRep_WeaponState()
 		break;
 	}
 }
+void AWeapon::SetHUDAmmo()
+{
+	TPSCharacter = TPSCharacter == nullptr ? Cast<ATPSCharacter>(GetOwner()) : TPSCharacter;
+	if (TPSCharacter)
+	{
+		TPSPlayerController = TPSPlayerController == nullptr ? Cast<ATPSPlayerController>(TPSCharacter->Controller) : TPSPlayerController;
+		if (TPSPlayerController)
+		{
+			TPSPlayerController->SetHUDAmmo(ammo);
+		}
+	}
+}
+void AWeapon::OnRep_Ammo()
+{
+	SetHUDAmmo();
+}
+void AWeapon::OnRep_Owner()
+{
+	Super::OnRep_Owner();
+	if (Owner == nullptr)
+	{
+		TPSCharacter = nullptr;
+		TPSPlayerController = nullptr;
+	}
+	else
+	{
+		SetHUDAmmo();
+	}
+
+}
+void AWeapon::SpendRound()
+{
+	--ammo;
+	SetHUDAmmo();
+}
 void AWeapon::ShowPickupWidget(bool _bShowWidget)
 {
 	if (pickupWidget)
@@ -149,6 +186,7 @@ void AWeapon::Fire(const FVector& HitTarget)
 			}
 		}
 	}
+	SpendRound();
 }
 
 void AWeapon::Dropped()
@@ -157,4 +195,6 @@ void AWeapon::Dropped()
 	FDetachmentTransformRules detachRules(EDetachmentRule::KeepWorld, true);
 	weaponMesh->DetachFromComponent(detachRules);
 	SetOwner(nullptr);
+	TPSCharacter = nullptr;
+	TPSPlayerController = nullptr;
 }
