@@ -69,3 +69,13 @@ void ATPSPlayerController::SetHUDAmmo(int32 _Ammo)
 		TPSHUD->characterOverlay->ammoAmountText->SetText(FText::FromString(ammoText));
 	}
 }
+void ATPSPlayerController::SetHUDCarriedAmmo(int32 _Ammo)
+{
+	TPSHUD = TPSHUD == nullptr ? Cast<ATPSHUD>(GetHUD()) : TPSHUD;
+	bool bValid = TPSHUD && TPSHUD->characterOverlay && TPSHUD->characterOverlay->carriedAmountText;
+	if (bValid)
+	{
+		FString ammoText = FString::Printf(TEXT("%d"), _Ammo);
+		TPSHUD->characterOverlay->carriedAmountText->SetText(FText::FromString(ammoText));
+	}
+}

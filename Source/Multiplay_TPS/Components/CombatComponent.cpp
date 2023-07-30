@@ -37,7 +37,15 @@ void UCombatComponent::BeginPlay()
 			defaultFOV = character->GetFollowCamera()->FieldOfView;
 			currentFOV = defaultFOV;
 		}
+		if (character->HasAuthority())
+		{
+			InitializeCarriedAmmo();
+		}
 	}
+}
+void UCombatComponent::InitializeCarriedAmmo()
+{
+	carriedAmmoMap.Emplace(EWeaponType::EWT_Rifle, startAmmo);
 }
 // Called every frame
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -169,7 +177,14 @@ void UCombatComponent::OnRep_EquippedWeapon()
 		character->bUseControllerRotationYaw = true;
 	}
 }
-
+void UCombatComponent::OnRep_CarriedAmmo()
+{
+	controller = controller == nullptr ? Cast<ATPSPlayerController>(character->Controller) : controller;
+	if (controller)
+	{
+		controller->SetHUDCarriedAmmo(carriedAmmo);
+	}
+}
 void UCombatComponent::StartFireTimer()
 {
 	if (equippedWeapon == nullptr || character == nullptr) return;
@@ -195,7 +210,7 @@ void UCombatComponent::FirePressed(bool _bPressed)
 }
 void UCombatComponent::Fire()
 {
-	if (bCanFire)
+	if (CanFire())
 	{
 		ServerFire(hitTarget);
 		if (equippedWeapon)
@@ -270,6 +285,7 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 
 	DOREPLIFETIME(UCombatComponent, equippedWeapon);
 	DOREPLIFETIME(UCombatComponent, bAiming);
+	DOREPLIFETIME_CONDITION(UCombatComponent, carriedAmmo, COND_OwnerOnly);
 }
 
 void UCombatComponent::EquipWeapon(AWeapon* _WeaponToEquip)
@@ -288,6 +304,23 @@ void UCombatComponent::EquipWeapon(AWeapon* _WeaponToEquip)
 	}
 	equippedWeapon->SetOwner(character);
 	equippedWeapon->SetHUDAmmo();
+
+	if (carriedAmmoMap.Contains(equippedWeapon->GetWeaponType()))
+	{
+		carriedAmmo = carriedAmmoMap[equippedWeapon->GetWeaponType()];
+	}
+	controller = controller == nullptr ? Cast<ATPSPlayerController>(character->Controller) : controller;
+	if (controller)
+	{
+		controller->SetHUDCarriedAmmo(carriedAmmo);
+	}
+
 	character->GetCharacterMovement()->bOrientRotationToMovement = false;
 	character->bUseControllerRotationYaw = true;
+}
+
+bool UCombatComponent::CanFire()
+{
+	if (equippedWeapon == nullptr) return false;
+	return !equippedWeapon->IsAmmoEmpty() || !bCanFire;
 }

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "WeaponTypes.h"
 #include "Weapon.generated.h"
 
 class USphereComponent;
@@ -38,6 +39,7 @@ public:
 	void ShowPickupWidget(bool _bShowWidget);
 	virtual void Fire(const FVector& HitTarget);
 	void Dropped();
+	bool IsAmmoEmpty();
 
 public:
 	// Texture Crosshairs
@@ -101,6 +103,8 @@ private:
 	ATPSCharacter* TPSCharacter;
 	UPROPERTY()
 	ATPSPlayerController* TPSPlayerController;
+	UPROPERTY(EditAnywhere)
+	EWeaponType weaponType;
 private:
 	UFUNCTION()
 	void OnRep_WeaponState();
@@ -115,4 +119,5 @@ public:
 	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh() const { return weaponMesh; }
 	FORCEINLINE float GetZoomed() const { return zoomed; }
 	FORCEINLINE float GetInterpSpeed() const { return zoomInterpSpeed; }
+	FORCEINLINE EWeaponType GetWeaponType() const { return weaponType; }
 };

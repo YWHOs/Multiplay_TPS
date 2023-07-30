@@ -33,4 +33,6 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* ammoAmountText;
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* carriedAmountText;
 };

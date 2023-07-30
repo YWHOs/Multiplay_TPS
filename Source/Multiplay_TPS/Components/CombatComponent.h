@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Multiplay_TPS/HUD/TPSHUD.h"
+#include "Multiplay_TPS/Weapon/WeaponTypes.h"
 #include "CombatComponent.generated.h"
 
 #define TRACE_LENGTH 80000.f;
@@ -39,17 +40,14 @@ protected:
 	void OnRep_EquippedWeapon();
 
 	void FirePressed(bool _bPressed);
-
 	void Fire();
 
 	UFUNCTION(Server, Reliable)
 	void ServerFire(const FVector_NetQuantize& _TraceHitTarget);
-
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastFire(const FVector_NetQuantize& _TraceHitTarget);
 
 	void TraceUnderCrosshairs(FHitResult& _TraceHitResult);
-
 	void SetHUDCrosshairs(float _DeltaTime);
 
 private:
@@ -96,11 +94,22 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	bool bCanFire = true;
 
+	UPROPERTY(ReplicatedUsing = OnRep_CarriedAmmo)
+	int32 carriedAmmo;
+	TMap<EWeaponType, int32> carriedAmmoMap;
+	UPROPERTY(EditAnywhere)
+	int32 startAmmo = 30;
+
 private:
 	void InterpFOV(float _DeltaTime);
 
 	void StartFireTimer();
 	void FireTimerFinish();
+	bool CanFire();
+
+	UFUNCTION()
+	void OnRep_CarriedAmmo();
+	void InitializeCarriedAmmo();
 
 public:	
 	FORCEINLINE ATPSCharacter* GetCharacter() { return character; }

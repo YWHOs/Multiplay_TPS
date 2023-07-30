@@ -155,7 +155,7 @@ void AWeapon::OnRep_Owner()
 }
 void AWeapon::SpendRound()
 {
-	--ammo;
+	ammo = FMath::Clamp(ammo - 1, 0, magCapacity);
 	SetHUDAmmo();
 }
 void AWeapon::ShowPickupWidget(bool _bShowWidget)
@@ -197,4 +197,9 @@ void AWeapon::Dropped()
 	SetOwner(nullptr);
 	TPSCharacter = nullptr;
 	TPSPlayerController = nullptr;
+}
+
+bool AWeapon::IsAmmoEmpty()
+{
+	return ammo <= 0;
 }
