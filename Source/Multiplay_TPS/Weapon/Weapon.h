@@ -40,6 +40,7 @@ public:
 	virtual void Fire(const FVector& HitTarget);
 	void Dropped();
 	bool IsAmmoEmpty();
+	void AddAmmo(int32 _Ammo);
 
 public:
 	// Texture Crosshairs
@@ -120,4 +121,6 @@ public:
 	FORCEINLINE float GetZoomed() const { return zoomed; }
 	FORCEINLINE float GetInterpSpeed() const { return zoomInterpSpeed; }
 	FORCEINLINE EWeaponType GetWeaponType() const { return weaponType; }
+	FORCEINLINE int32 GetAmmo() const { return ammo; }
+	FORCEINLINE int32 GetMagCapacity() const { return magCapacity; }
 };

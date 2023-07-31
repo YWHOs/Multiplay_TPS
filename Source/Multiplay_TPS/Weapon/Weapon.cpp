@@ -139,6 +139,11 @@ void AWeapon::OnRep_Ammo()
 {
 	SetHUDAmmo();
 }
+void AWeapon::AddAmmo(int32 _Ammo)
+{
+	ammo = FMath::Clamp(ammo - _Ammo, 0, magCapacity);
+	SetHUDAmmo();
+}
 void AWeapon::OnRep_Owner()
 {
 	Super::OnRep_Owner();

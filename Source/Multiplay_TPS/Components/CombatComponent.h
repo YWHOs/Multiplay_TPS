@@ -55,6 +55,7 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void ServerReload();
 	void HandleReload();
+	int32 AmountToReload();
 
 private:
 	UPROPERTY()
@@ -123,6 +124,7 @@ private:
 
 	UFUNCTION()
 	void OnRep_CombatState();
+	void UpdateAmmo();
 
 public:	
 	FORCEINLINE ATPSCharacter* GetCharacter() { return character; }
