@@ -78,4 +78,6 @@ void UTPSAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	}
 	
 	bUseFABRIK = character->GetCombatState() != ECombatState::ECS_Reloading;
+	bUseAimOffset = character->GetCombatState() != ECombatState::ECS_Reloading;
+	bTransformRightHand = character->GetCombatState() != ECombatState::ECS_Reloading;
 }

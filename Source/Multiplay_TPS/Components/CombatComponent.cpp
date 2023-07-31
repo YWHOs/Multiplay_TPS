@@ -12,6 +12,7 @@
 #include "Multiplay_TPS/PlayerController/TPSPlayerController.h"
 #include "Camera/CameraComponent.h"
 #include "TimerManager.h"
+#include "Sound/SoundCue.h"
 
 // Sets default values for this component's properties
 UCombatComponent::UCombatComponent()
@@ -175,6 +176,10 @@ void UCombatComponent::OnRep_EquippedWeapon()
 		}
 		character->GetCharacterMovement()->bOrientRotationToMovement = false;
 		character->bUseControllerRotationYaw = true;
+		if (equippedWeapon->equipSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, equippedWeapon->equipSound, character->GetActorLocation());
+		}
 	}
 }
 void UCombatComponent::OnRep_CarriedAmmo()
@@ -314,6 +319,10 @@ void UCombatComponent::EquipWeapon(AWeapon* _WeaponToEquip)
 	if (controller)
 	{
 		controller->SetHUDCarriedAmmo(carriedAmmo);
+	}
+	if (equippedWeapon->equipSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, equippedWeapon->equipSound, character->GetActorLocation());
 	}
 
 	character->GetCharacterMovement()->bOrientRotationToMovement = false;

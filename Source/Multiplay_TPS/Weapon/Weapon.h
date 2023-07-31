@@ -12,6 +12,7 @@ class UWidgetComponent;
 class UTexture2D;
 class ATPSCharacter;
 class ATPSPlayerController;
+class USoundCue;
 
 UENUM(BlueprintType)
 enum class EWeaponState : uint8
@@ -66,6 +67,9 @@ public:
 	float fireDelay = .15f;
 	UPROPERTY(EditAnywhere)
 	bool bAutomatic = true;
+
+	UPROPERTY(EditAnywhere)
+	USoundCue* equipSound;
 
 protected:
 	// Called when the game starts or when spawned
