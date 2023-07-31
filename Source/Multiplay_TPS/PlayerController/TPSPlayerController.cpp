@@ -19,6 +19,16 @@ void ATPSPlayerController::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	SetHUDTime();
+	CheckTimeSync(DeltaTime);
+}
+void ATPSPlayerController::CheckTimeSync(float _DeltaTime)
+{
+	timeSyncRunningTime += _DeltaTime;
+	if (IsLocalController() && timeSyncRunningTime > timeSyncFrequency)
+	{
+		ServerRequestTime(GetWorld()->GetTimeSeconds());
+		timeSyncRunningTime = 0.f;
+	}
 }
 void ATPSPlayerController::OnPossess(APawn* _Pawn)
 {
@@ -102,11 +112,36 @@ void ATPSPlayerController::SetHUDCountdown(float _Count)
 
 void ATPSPlayerController::SetHUDTime()
 {
-	uint32 leftSeconds = FMath::CeilToInt(matchTime - GetWorld()->GetTimeSeconds());
+	uint32 leftSeconds = FMath::CeilToInt(matchTime - GetServerTime());
 
 	if (countdown != leftSeconds)
 	{
-		SetHUDCountdown(matchTime - GetWorld()->GetTimeSeconds());
+		SetHUDCountdown(matchTime - GetServerTime());
 	}
 	countdown = leftSeconds;
+}
+
+void ATPSPlayerController::ServerRequestTime_Implementation(float _Time)
+{
+	float serverTime = GetWorld()->GetTimeSeconds();
+	ClientReportTime(_Time, serverTime);
+}
+void ATPSPlayerController::ClientReportTime_Implementation(float _Time, float _TimeServerRequest)
+{
+	float roundTripTime = GetWorld()->GetTimeSeconds() - _Time;
+	float currentServerTime = _TimeServerRequest + (0.5f * roundTripTime);
+	clientServerDelta = currentServerTime - GetWorld()->GetTimeSeconds();
+}
+float ATPSPlayerController::GetServerTime()
+{
+	return GetWorld()->GetTimeSeconds() + clientServerDelta;
+}
+void ATPSPlayerController::ReceivedPlayer()
+{
+	Super::ReceivedPlayer();
+
+	if (IsLocalController())
+	{
+		ServerRequestTime(GetWorld()->GetTimeSeconds());
+	}
 }
