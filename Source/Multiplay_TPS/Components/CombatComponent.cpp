@@ -286,6 +286,7 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(UCombatComponent, equippedWeapon);
 	DOREPLIFETIME(UCombatComponent, bAiming);
 	DOREPLIFETIME_CONDITION(UCombatComponent, carriedAmmo, COND_OwnerOnly);
+	DOREPLIFETIME(UCombatComponent, combatState);
 }
 
 void UCombatComponent::EquipWeapon(AWeapon* _WeaponToEquip)
@@ -318,7 +319,41 @@ void UCombatComponent::EquipWeapon(AWeapon* _WeaponToEquip)
 	character->GetCharacterMovement()->bOrientRotationToMovement = false;
 	character->bUseControllerRotationYaw = true;
 }
+void UCombatComponent::Reload()
+{
+	if (carriedAmmo > 0 && combatState != ECombatState::ECS_Reloading)
+	{
+		ServerReload();
+	}
+}
+void UCombatComponent::FinishReload()
+{
+	if (character == nullptr) return;
+	if (character->HasAuthority())
+	{
+		combatState = ECombatState::ECS_Unoccupied;
+	}
 
+}
+void UCombatComponent::ServerReload_Implementation()
+{
+	if (character == nullptr) return;
+	combatState = ECombatState::ECS_Reloading;
+	HandleReload();
+}
+void UCombatComponent::HandleReload()
+{
+	character->PlayReloadMontage();
+}
+void UCombatComponent::OnRep_CombatState()
+{
+	switch (combatState)
+	{
+	case ECombatState::ECS_Reloading:
+		HandleReload();
+		break;
+	}
+}
 bool UCombatComponent::CanFire()
 {
 	if (equippedWeapon == nullptr) return false;

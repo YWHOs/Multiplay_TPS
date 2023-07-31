@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "Multiplay_TPS/HUD/TPSHUD.h"
 #include "Multiplay_TPS/Weapon/WeaponTypes.h"
+#include "Multiplay_TPS/TPSTypes/CombatState.h"
 #include "CombatComponent.generated.h"
 
 #define TRACE_LENGTH 80000.f;
@@ -24,9 +25,11 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-	
 
 	void EquipWeapon(AWeapon* _WeaponToEquip);
+	void Reload();
+	UFUNCTION(BlueprintCallable)
+	void FinishReload();
 
 protected:
 	// Called when the game starts
@@ -49,6 +52,9 @@ protected:
 
 	void TraceUnderCrosshairs(FHitResult& _TraceHitResult);
 	void SetHUDCrosshairs(float _DeltaTime);
+	UFUNCTION(Server, Reliable)
+	void ServerReload();
+	void HandleReload();
 
 private:
 	UPROPERTY()
@@ -100,6 +106,10 @@ private:
 	UPROPERTY(EditAnywhere)
 	int32 startAmmo = 30;
 
+	UPROPERTY(ReplicatedUsing = OnRep_CombatState)
+	ECombatState combatState = ECombatState::ECS_Unoccupied;
+
+
 private:
 	void InterpFOV(float _DeltaTime);
 
@@ -110,6 +120,9 @@ private:
 	UFUNCTION()
 	void OnRep_CarriedAmmo();
 	void InitializeCarriedAmmo();
+
+	UFUNCTION()
+	void OnRep_CombatState();
 
 public:	
 	FORCEINLINE ATPSCharacter* GetCharacter() { return character; }

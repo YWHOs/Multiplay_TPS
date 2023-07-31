@@ -6,6 +6,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Multiplay_TPS/Weapon/Weapon.h"
+#include "Multiplay_TPS/TPSTypes/CombatState.h"
 
 void UTPSAnimInstance::NativeInitializeAnimation()
 {
@@ -74,6 +75,7 @@ void UTPSAnimInstance::NativeUpdateAnimation(float DeltaTime)
 			FRotator lookAtRotation = UKismetMathLibrary::FindLookAtRotation(rightHandTransform.GetLocation(), rightHandTransform.GetLocation() + (rightHandTransform.GetLocation() - character->GetHitTarget()));
 			rightHandRotation = FMath::RInterpTo(rightHandRotation, lookAtRotation, DeltaTime, 30.f);
 		}
-
 	}
+	
+	bUseFABRIK = character->GetCombatState() != ECombatState::ECS_Reloading;
 }

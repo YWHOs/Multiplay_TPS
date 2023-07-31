@@ -7,6 +7,7 @@
 #include "Multiplay_TPS/TPSTypes/TurningInPlace.h"
 #include "Multiplay_TPS/Interface/InteractCrosshair_Interface.h"
 #include "Components/TimelineComponent.h"
+#include "Multiplay_TPS/TPSTypes/CombatState.h"
 #include "TPSCharacter.generated.h"
 
 class UAnimMontage;
@@ -32,6 +33,7 @@ protected:
 	void LookUp(float _value);
 	void EquipPressed();
 	void CrouchPressed();
+	void ReloadPressed();
 	void AimPressed();
 	void AimReleased();
 	void AimOffset(float DeltaTime);
@@ -51,6 +53,7 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PostInitializeComponents() override;
 	void PlayFireMontage(bool bAiming);
+	void PlayReloadMontage();
 	void PlayElimMontage();
 	virtual void OnRep_ReplicatedMovement() override;
 	void Elim();
@@ -65,6 +68,8 @@ public:
 
 	virtual void Destroyed() override;
 
+	ECombatState GetCombatState() const;
+
 private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class USpringArmComponent* cameraBoom;
@@ -77,7 +82,7 @@ private:
 	UPROPERTY(ReplicatedUsing = OnRep_OverlappingWeapon)
 	class AWeapon* overlappingWeapon;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UCombatComponent* combatComponent;
 
 	float ao_Yaw;
@@ -87,8 +92,11 @@ private:
 
 	ETurningInPlace turningInPlace;
 
+	// Animation
 	UPROPERTY(EditAnywhere, Category = Combat)
 	UAnimMontage* fireWeaponMontage;
+	UPROPERTY(EditAnywhere, Category = Combat)
+	UAnimMontage* reloadMontage;
 	UPROPERTY(EditAnywhere, Category = Combat)
 	UAnimMontage* hitReactMontage;
 	UPROPERTY(EditAnywhere, Category = Combat)

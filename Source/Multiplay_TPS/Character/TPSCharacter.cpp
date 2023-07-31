@@ -8,6 +8,7 @@
 #include "Components/WidgetComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "Multiplay_TPS/Weapon/Weapon.h"
+#include "Multiplay_TPS/Weapon/WeaponTypes.h"
 #include "Multiplay_TPS/Components/CombatComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -138,6 +139,7 @@ void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &ATPSCharacter::CrouchPressed);
 	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &ATPSCharacter::AimPressed);
 	PlayerInputComponent->BindAction("Aim", IE_Released, this, &ATPSCharacter::AimReleased);
+	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &ATPSCharacter::ReloadPressed);
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ATPSCharacter::FirePressed);
 	PlayerInputComponent->BindAction("Fire", IE_Released, this, &ATPSCharacter::FireReleased);
 }
@@ -238,6 +240,13 @@ void ATPSCharacter::CrouchPressed()
 		Crouch();
 	}
 }
+void ATPSCharacter::ReloadPressed()
+{
+	if (combatComponent)
+	{
+		combatComponent->Reload();
+	}
+}
 void ATPSCharacter::AimPressed()
 {
 	if (combatComponent)
@@ -276,6 +285,24 @@ void ATPSCharacter::PlayFireMontage(bool bAiming)
 		animInstance->Montage_Play(fireWeaponMontage);
 		FName sectionName;
 		sectionName = bAiming ? FName("RifleAim") : FName("RifleHip");
+		animInstance->Montage_JumpToSection(sectionName);
+	}
+}
+void ATPSCharacter::PlayReloadMontage()
+{
+	if (combatComponent == nullptr || combatComponent->equippedWeapon == nullptr) return;
+
+	UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
+	if (animInstance && reloadMontage)
+	{
+		animInstance->Montage_Play(reloadMontage);
+		FName sectionName;
+		switch (combatComponent->equippedWeapon->GetWeaponType())
+		{
+		case EWeaponType::EWT_Rifle:
+			sectionName = FName("Rifle");
+			break;
+		}
 		animInstance->Montage_JumpToSection(sectionName);
 	}
 }
@@ -563,4 +590,10 @@ FVector ATPSCharacter::GetHitTarget() const
 {
 	if (combatComponent == nullptr) return FVector();
 	return combatComponent->hitTarget;
+}
+
+ECombatState ATPSCharacter::GetCombatState() const
+{
+	if (combatComponent == nullptr) return ECombatState::ECS_MAX;
+	return combatComponent->combatState;
 }
