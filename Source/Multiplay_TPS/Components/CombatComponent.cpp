@@ -231,7 +231,7 @@ void UCombatComponent::MulticastFire_Implementation(const FVector_NetQuantize& _
 {
 	// 모든 클라이언트에서 사용가능
 	if (equippedWeapon == nullptr) return;
-	if (character)
+	if (character && combatState == ECombatState::ECS_Unoccupied)
 	{
 		character->PlayFireMontage(bAiming);
 		equippedWeapon->Fire(_TraceHitTarget);
@@ -333,7 +333,10 @@ void UCombatComponent::FinishReload()
 	{
 		combatState = ECombatState::ECS_Unoccupied;
 	}
-
+	if (bFirePressed)
+	{
+		Fire();
+	}
 }
 void UCombatComponent::ServerReload_Implementation()
 {
@@ -352,10 +355,16 @@ void UCombatComponent::OnRep_CombatState()
 	case ECombatState::ECS_Reloading:
 		HandleReload();
 		break;
+	case ECombatState::ECS_Unoccupied:
+		if (bFirePressed)
+		{
+			Fire();
+		}
+		break;
 	}
 }
 bool UCombatComponent::CanFire()
 {
 	if (equippedWeapon == nullptr) return false;
-	return !equippedWeapon->IsAmmoEmpty() || !bCanFire;
+	return !equippedWeapon->IsAmmoEmpty() && bCanFire && combatState == ECombatState::ECS_Unoccupied;
 }
