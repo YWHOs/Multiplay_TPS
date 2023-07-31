@@ -203,6 +203,10 @@ void UCombatComponent::FireTimerFinish()
 	{
 		Fire();
 	}
+	if (equippedWeapon->IsAmmoEmpty())
+	{
+		Reload();
+	}
 }
 void UCombatComponent::FirePressed(bool _bPressed)
 {
@@ -320,9 +324,15 @@ void UCombatComponent::EquipWeapon(AWeapon* _WeaponToEquip)
 	{
 		controller->SetHUDCarriedAmmo(carriedAmmo);
 	}
+	//사운드
 	if (equippedWeapon->equipSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, equippedWeapon->equipSound, character->GetActorLocation());
+	}
+	// 재장전
+	if (equippedWeapon->IsAmmoEmpty())
+	{
+		Reload();
 	}
 
 	character->GetCharacterMovement()->bOrientRotationToMovement = false;

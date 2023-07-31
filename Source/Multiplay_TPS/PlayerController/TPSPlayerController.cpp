@@ -14,6 +14,12 @@ void ATPSPlayerController::BeginPlay()
 
 	TPSHUD = Cast<ATPSHUD>(GetHUD());
 }
+void ATPSPlayerController::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	SetHUDTime();
+}
 void ATPSPlayerController::OnPossess(APawn* _Pawn)
 {
 	Super::OnPossess(_Pawn);
@@ -78,4 +84,29 @@ void ATPSPlayerController::SetHUDCarriedAmmo(int32 _Ammo)
 		FString ammoText = FString::Printf(TEXT("%d"), _Ammo);
 		TPSHUD->characterOverlay->carriedAmountText->SetText(FText::FromString(ammoText));
 	}
+}
+
+void ATPSPlayerController::SetHUDCountdown(float _Count)
+{
+	TPSHUD = TPSHUD == nullptr ? Cast<ATPSHUD>(GetHUD()) : TPSHUD;
+	bool bValid = TPSHUD && TPSHUD->characterOverlay && TPSHUD->characterOverlay->countdownText;
+	if (bValid)
+	{
+		int32 minutes = FMath::FloorToInt(_Count / 60.f);
+		int32 seconds = _Count - minutes * 60;
+
+		FString countdownText = FString::Printf(TEXT("%02d : %02d"), minutes, seconds);
+		TPSHUD->characterOverlay->countdownText->SetText(FText::FromString(countdownText));
+	}
+}
+
+void ATPSPlayerController::SetHUDTime()
+{
+	uint32 leftSeconds = FMath::CeilToInt(matchTime - GetWorld()->GetTimeSeconds());
+
+	if (countdown != leftSeconds)
+	{
+		SetHUDCountdown(matchTime - GetWorld()->GetTimeSeconds());
+	}
+	countdown = leftSeconds;
 }

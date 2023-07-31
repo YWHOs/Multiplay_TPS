@@ -22,14 +22,20 @@ public:
 	void SetHUDDie(int32 _Die);
 	void SetHUDAmmo(int32 _Ammo);
 	void SetHUDCarriedAmmo(int32 _Ammo);
+	void SetHUDCountdown(float _Count);
 	virtual void OnPossess(APawn* _Pawn) override;
+	virtual void Tick(float DeltaTime) override;
 
 
 protected:
 	virtual void BeginPlay() override;
+	void SetHUDTime();
 
 private:
 	UPROPERTY()
 	ATPSHUD* TPSHUD;
+
+	float matchTime = 60.f;
+	uint32 countdown = 0;
 
 };
