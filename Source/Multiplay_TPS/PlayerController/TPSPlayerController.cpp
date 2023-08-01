@@ -7,6 +7,8 @@
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 #include "Multiplay_TPS/Character/TPSCharacter.h"
+#include "Net/UnrealNetwork.h"
+#include "Multiplay_TPS/TPSGameMode.h"
 
 void ATPSPlayerController::BeginPlay()
 {
@@ -14,12 +16,35 @@ void ATPSPlayerController::BeginPlay()
 
 	TPSHUD = Cast<ATPSHUD>(GetHUD());
 }
+void ATPSPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ATPSPlayerController, matchState);
+}
 void ATPSPlayerController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 	SetHUDTime();
 	CheckTimeSync(DeltaTime);
+	PollInit();
+}
+void ATPSPlayerController::PollInit()
+{
+	if (characterOverlay == nullptr)
+	{
+		if (TPSHUD && TPSHUD->characterOverlay)
+		{
+			characterOverlay = TPSHUD->characterOverlay;
+			if (characterOverlay)
+			{
+				SetHUDHealth(HUDHealth, HUDMaxHealth);
+				SetHUDScore(HUDScore);
+				SetHUDDie(HUDDie);
+			}
+		}
+	}
 }
 void ATPSPlayerController::CheckTimeSync(float _DeltaTime)
 {
@@ -51,6 +76,12 @@ void ATPSPlayerController::SetHUDHealth(float _Health, float _MaxHealth)
 		FString healthText = FString::Printf(TEXT("%d/%d"), FMath::CeilToInt(_Health), FMath::CeilToInt(_MaxHealth));
 		TPSHUD->characterOverlay->healthText->SetText(FText::FromString(healthText));
 	}
+	else
+	{
+		bInitCharacterOverlay = true;
+		HUDHealth = _Health;
+		HUDMaxHealth = _MaxHealth;
+	}
 }
 
 void ATPSPlayerController::SetHUDScore(float _Score)
@@ -62,6 +93,11 @@ void ATPSPlayerController::SetHUDScore(float _Score)
 		FString scoreText = FString::Printf(TEXT("%d"), FMath::FloorToInt(_Score));
 		TPSHUD->characterOverlay->scoreAmountText->SetText(FText::FromString(scoreText));
 	}
+	else
+	{
+		bInitCharacterOverlay = true;
+		HUDScore = _Score;
+	}
 }
 
 void ATPSPlayerController::SetHUDDie(int32 _Die)
@@ -72,6 +108,11 @@ void ATPSPlayerController::SetHUDDie(int32 _Die)
 	{
 		FString dieText = FString::Printf(TEXT("%d"), _Die);
 		TPSHUD->characterOverlay->dieAmountText->SetText(FText::FromString(dieText));
+	}
+	else
+	{
+		bInitCharacterOverlay = true;
+		HUDDie = _Die;
 	}
 }
 
@@ -143,5 +184,31 @@ void ATPSPlayerController::ReceivedPlayer()
 	if (IsLocalController())
 	{
 		ServerRequestTime(GetWorld()->GetTimeSeconds());
+	}
+}
+
+void ATPSPlayerController::OnMatchStateSet(FName _State)
+{
+	matchState = _State;
+
+	if (matchState == MatchState::InProgress)
+	{
+		TPSHUD = TPSHUD == nullptr ? Cast<ATPSHUD>(GetHUD()) : TPSHUD;
+		if (TPSHUD)
+		{
+			TPSHUD->AddCharacterOverlay();
+		}
+	}
+}
+
+void ATPSPlayerController::OnRep_MatchState()
+{
+	if (matchState == MatchState::InProgress)
+	{
+		TPSHUD = TPSHUD == nullptr ? Cast<ATPSHUD>(GetHUD()) : TPSHUD;
+		if (TPSHUD)
+		{
+			TPSHUD->AddCharacterOverlay();
+		}
 	}
 }

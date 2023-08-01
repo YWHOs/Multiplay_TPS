@@ -10,6 +10,7 @@
  * 
  */
 class ATPSHUD;
+class UCharacterOverlay;
 
 UCLASS()
 class MULTIPLAY_TPS_API ATPSPlayerController : public APlayerController
@@ -29,9 +30,13 @@ public:
 	virtual float GetServerTime();
 	virtual void ReceivedPlayer() override;
 
+	void OnMatchStateSet(FName _State);
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 protected:
 	virtual void BeginPlay() override;
 	void SetHUDTime();
+	void PollInit();
 
 	// 클라이언트 와 서버 싱크 시간
 	UFUNCTION(Server, Reliable)
@@ -47,10 +52,24 @@ protected:
 	float timeSyncRunningTime = 0.f;
 
 private:
+	UFUNCTION()
+	void OnRep_MatchState();
+private:
 	UPROPERTY()
 	ATPSHUD* TPSHUD;
 
 	float matchTime = 180.f;
 	uint32 countdown = 0;
 
+	UPROPERTY(ReplicatedUsing = OnRep_MatchState)
+	FName matchState;
+
+	UPROPERTY()
+	UCharacterOverlay* characterOverlay;
+	bool bInitCharacterOverlay = false;
+
+	float HUDHealth;
+	float HUDMaxHealth;
+	float HUDScore;
+	int32 HUDDie;
 };

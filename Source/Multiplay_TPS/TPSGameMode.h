@@ -19,6 +19,20 @@ class MULTIPLAY_TPS_API ATPSGameMode : public AGameMode
 	
 
 public:
+	ATPSGameMode();
+	virtual void Tick(float DeltaTime) override;
 	virtual void PlayerEliminated(ATPSCharacter* _ElimCharacter, ATPSPlayerController* _VictimController, ATPSPlayerController* _AttackController);
 	virtual void RequestRespawn(ACharacter* _ElimCharacter, AController* _ElimController);
+
+public:
+	UPROPERTY(EditDefaultsOnly)
+	float warmupTime = 10.f;
+	float levelStartTime = 0.f;
+
+protected:
+	virtual void BeginPlay() override;
+	virtual void OnMatchStateSet() override;
+
+private:
+	float countdownTime = 0.f;
 };

@@ -36,15 +36,15 @@ class MULTIPLAY_TPS_API ATPSHUD : public AHUD
 	
 public:
 	virtual void DrawHUD() override;
-
+	void AddCharacterOverlay();
 public:
 	UPROPERTY(EditAnywhere, Category = "Stat")
 	TSubclassOf<class UUserWidget> characterOverlayClass;
+	UPROPERTY()
 	UCharacterOverlay* characterOverlay;
 
 protected:
 	virtual void BeginPlay() override;
-	void AddCharacterOverlay();
 
 private:
 	FHUDPackage HUDPackage;

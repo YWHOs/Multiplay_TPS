@@ -7,8 +7,6 @@
 void ATPSHUD::BeginPlay()
 {
 	Super::BeginPlay();
-
-	AddCharacterOverlay();
 }
 void ATPSHUD::AddCharacterOverlay()
 {

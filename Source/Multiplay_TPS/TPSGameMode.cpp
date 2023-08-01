@@ -8,6 +8,44 @@
 #include "GameFramework/PlayerStart.h"
 #include "Multiplay_TPS/PlayerState/TPSPlayerState.h"
 
+ATPSGameMode::ATPSGameMode()
+{
+	bDelayedStart = true;
+
+}
+void ATPSGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+
+	levelStartTime = GetWorld()->GetTimeSeconds();
+}
+void ATPSGameMode::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (MatchState == MatchState::WaitingToStart)
+	{
+		countdownTime = warmupTime - GetWorld()->GetTimeSeconds() + levelStartTime;
+		if (countdownTime <= 0.f)
+		{
+			StartMatch();
+		}
+	}
+}
+void ATPSGameMode::OnMatchStateSet()
+{
+	Super::OnMatchStateSet();
+
+	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	{
+		ATPSPlayerController* controller = Cast<ATPSPlayerController>(*It);
+		if (controller)
+		{
+			controller->OnMatchStateSet(MatchState);
+		}
+	}
+	
+}
 void ATPSGameMode::PlayerEliminated(ATPSCharacter* _ElimCharacter, ATPSPlayerController* _VictimController, ATPSPlayerController* _AttackController)
 {
 	ATPSPlayerState* attackerState = _AttackController ? Cast<ATPSPlayerState>(_AttackController->PlayerState) : nullptr;
