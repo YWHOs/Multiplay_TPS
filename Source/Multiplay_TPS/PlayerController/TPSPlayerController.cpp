@@ -9,12 +9,17 @@
 #include "Multiplay_TPS/Character/TPSCharacter.h"
 #include "Net/UnrealNetwork.h"
 #include "Multiplay_TPS/TPSGameMode.h"
+#include "Multiplay_TPS/HUD/Announcement.h"
 
 void ATPSPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
 	TPSHUD = Cast<ATPSHUD>(GetHUD());
+	if (TPSHUD)
+	{
+		TPSHUD->AddAnnouncement();
+	}
 }
 void ATPSPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
@@ -193,11 +198,7 @@ void ATPSPlayerController::OnMatchStateSet(FName _State)
 
 	if (matchState == MatchState::InProgress)
 	{
-		TPSHUD = TPSHUD == nullptr ? Cast<ATPSHUD>(GetHUD()) : TPSHUD;
-		if (TPSHUD)
-		{
-			TPSHUD->AddCharacterOverlay();
-		}
+		HandleMatch();
 	}
 }
 
@@ -205,10 +206,18 @@ void ATPSPlayerController::OnRep_MatchState()
 {
 	if (matchState == MatchState::InProgress)
 	{
-		TPSHUD = TPSHUD == nullptr ? Cast<ATPSHUD>(GetHUD()) : TPSHUD;
-		if (TPSHUD)
+		HandleMatch();
+	}
+}
+void ATPSPlayerController::HandleMatch()
+{
+	TPSHUD = TPSHUD == nullptr ? Cast<ATPSHUD>(GetHUD()) : TPSHUD;
+	if (TPSHUD)
+	{
+		TPSHUD->AddCharacterOverlay();
+		if (TPSHUD->announcement)
 		{
-			TPSHUD->AddCharacterOverlay();
+			TPSHUD->announcement->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
 }

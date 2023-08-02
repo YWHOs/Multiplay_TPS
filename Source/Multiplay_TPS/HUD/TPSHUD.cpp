@@ -3,6 +3,7 @@
 
 #include "TPSHUD.h"
 #include "CharacterOverlay.h"
+#include "Announcement.h"
 
 void ATPSHUD::BeginPlay()
 {
@@ -15,6 +16,15 @@ void ATPSHUD::AddCharacterOverlay()
 	{
 		characterOverlay = CreateWidget<UCharacterOverlay>(playerController, characterOverlayClass);
 		characterOverlay->AddToViewport();
+	}
+}
+void ATPSHUD::AddAnnouncement()
+{
+	APlayerController* playerController = GetOwningPlayerController();
+	if (playerController && announcementClass)
+	{
+		announcement = CreateWidget<UAnnouncement>(playerController, announcementClass);
+		announcement->AddToViewport();
 	}
 }
 void ATPSHUD::DrawHUD()

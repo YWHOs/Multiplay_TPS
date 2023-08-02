@@ -44,6 +44,8 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void ClientReportTime(float _Time, float _TimeServerRequest);
 	void CheckTimeSync(float _DeltaTime);
+
+	void HandleMatch();
 protected:
 	// 클라이언트와 서버 시간 차이
 	float clientServerDelta = 0.f;
