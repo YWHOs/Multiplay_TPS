@@ -10,16 +10,16 @@
 #include "Net/UnrealNetwork.h"
 #include "Multiplay_TPS/TPSGameMode.h"
 #include "Multiplay_TPS/HUD/Announcement.h"
+#include "Kismet/GameplayStatics.h"
 
 void ATPSPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
+	ServerCheckMatchState();
+
 	TPSHUD = Cast<ATPSHUD>(GetHUD());
-	if (TPSHUD)
-	{
-		TPSHUD->AddAnnouncement();
-	}
+	ServerCheckMatchState();
 }
 void ATPSPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
@@ -58,6 +58,34 @@ void ATPSPlayerController::CheckTimeSync(float _DeltaTime)
 	{
 		ServerRequestTime(GetWorld()->GetTimeSeconds());
 		timeSyncRunningTime = 0.f;
+	}
+}
+void ATPSPlayerController::ServerCheckMatchState_Implementation()
+{
+	ATPSGameMode* gameMode = Cast<ATPSGameMode>(UGameplayStatics::GetGameMode(this));
+	if (gameMode)
+	{
+		warmupTime = gameMode->warmupTime;
+		matchTime = gameMode->matchTime;
+		levelStartTime = gameMode->levelStartTime;
+		matchState = gameMode->GetMatchState();
+		ClientJoinGame(matchState, warmupTime, matchTime, levelStartTime);
+		if (TPSHUD && matchState == MatchState::WaitingToStart)
+		{
+			TPSHUD->AddAnnouncement();
+		}
+	}
+}
+void ATPSPlayerController::ClientJoinGame_Implementation(FName _StateMatch, float _Warmup, float _MatchTime, float _StartTime)
+{
+	warmupTime = _Warmup;
+	matchTime = _MatchTime;
+	levelStartTime = _StartTime;
+	matchState = _StateMatch;
+	OnMatchStateSet(matchState);
+	if (TPSHUD && matchState == MatchState::WaitingToStart)
+	{
+		TPSHUD->AddAnnouncement();
 	}
 }
 void ATPSPlayerController::OnPossess(APawn* _Pawn)
@@ -155,14 +183,39 @@ void ATPSPlayerController::SetHUDCountdown(float _Count)
 		TPSHUD->characterOverlay->countdownText->SetText(FText::FromString(countdownText));
 	}
 }
+void ATPSPlayerController::SetHUDAnnouncement(float _Count)
+{
+	TPSHUD = TPSHUD == nullptr ? Cast<ATPSHUD>(GetHUD()) : TPSHUD;
+	bool bValid = TPSHUD && TPSHUD->announcement && TPSHUD->announcement->warmupText;
+	if (bValid)
+	{
+		int32 minutes = FMath::FloorToInt(_Count / 60.f);
+		int32 seconds = _Count - minutes * 60;
+
+		FString countdownText = FString::Printf(TEXT("%02d : %02d"), minutes, seconds);
+		TPSHUD->announcement->warmupText->SetText(FText::FromString(countdownText));
+	}
+}
 
 void ATPSPlayerController::SetHUDTime()
 {
-	uint32 leftSeconds = FMath::CeilToInt(matchTime - GetServerTime());
+	float leftTime = 0.f;
+	if (matchState == MatchState::WaitingToStart) leftTime = warmupTime - GetServerTime() + levelStartTime;
+	else if (matchState == MatchState::InProgress) leftTime = warmupTime + matchTime - GetServerTime() + levelStartTime;
+
+	uint32 leftSeconds = FMath::CeilToInt(leftTime);
 
 	if (countdown != leftSeconds)
 	{
-		SetHUDCountdown(matchTime - GetServerTime());
+		if (matchState == MatchState::WaitingToStart)
+		{
+			SetHUDAnnouncement(leftTime);
+		}
+		if (matchState == MatchState::InProgress)
+		{
+			SetHUDCountdown(leftTime);
+		}
+
 	}
 	countdown = leftSeconds;
 }

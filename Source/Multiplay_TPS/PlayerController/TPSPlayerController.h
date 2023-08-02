@@ -24,6 +24,7 @@ public:
 	void SetHUDAmmo(int32 _Ammo);
 	void SetHUDCarriedAmmo(int32 _Ammo);
 	void SetHUDCountdown(float _Count);
+	void SetHUDAnnouncement(float _Count);
 	virtual void OnPossess(APawn* _Pawn) override;
 	virtual void Tick(float DeltaTime) override;
 
@@ -46,6 +47,10 @@ protected:
 	void CheckTimeSync(float _DeltaTime);
 
 	void HandleMatch();
+	UFUNCTION(Server, Reliable)
+	void ServerCheckMatchState();
+	UFUNCTION(Client, Reliable)
+	void ClientJoinGame(FName _StateMatch, float _Warmup, float _MatchTime, float _StartTime);
 protected:
 	// 클라이언트와 서버 시간 차이
 	float clientServerDelta = 0.f;
@@ -60,7 +65,9 @@ private:
 	UPROPERTY()
 	ATPSHUD* TPSHUD;
 
-	float matchTime = 180.f;
+	float levelStartTime = 0.f;
+	float matchTime = 0.f;
+	float warmupTime = 0.f;
 	uint32 countdown = 0;
 
 	UPROPERTY(ReplicatedUsing = OnRep_MatchState)
