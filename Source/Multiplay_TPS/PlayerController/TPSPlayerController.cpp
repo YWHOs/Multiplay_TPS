@@ -12,6 +12,8 @@
 #include "Multiplay_TPS/HUD/Announcement.h"
 #include "Kismet/GameplayStatics.h"
 #include "Multiplay_TPS/Components//CombatComponent.h"
+#include "Multiplay_TPS/PlayerState/TPSPlayerState.h"
+#include "Multiplay_TPS/GameState/TPSGameState.h"
 
 void ATPSPlayerController::BeginPlay()
 {
@@ -312,7 +314,35 @@ void ATPSPlayerController::HandleCooldown()
 			TPSHUD->announcement->SetVisibility(ESlateVisibility::Visible);
 			FString announcementText("New Match START:");
 			TPSHUD->announcement->announcementText->SetText(FText::FromString(announcementText));
-			TPSHUD->announcement->infoText->SetText(FText());
+
+			ATPSGameState* gameState = Cast<ATPSGameState>(UGameplayStatics::GetGameState(this));
+			ATPSPlayerState* playerState = GetPlayerState<ATPSPlayerState>();
+			if (gameState && playerState)
+			{
+				TArray<ATPSPlayerState*> topPlayers = gameState->topScorePlayers;
+				FString infoTextString;
+				if (topPlayers.Num() == 0)
+				{
+					infoTextString = FString("NO Winner.");
+				}
+				else if (topPlayers.Num() == 1 && topPlayers[0] == playerState)
+				{
+					infoTextString = FString("WIN!");
+				}
+				else if (topPlayers.Num() == 1)
+				{
+					infoTextString = FString::Printf(TEXT("Winner \n%s"), *topPlayers[0]->GetPlayerName());
+				}
+				else if (topPlayers.Num() > 1)
+				{
+					infoTextString = FString("Winner Players\n");
+					for (auto player : topPlayers)
+					{
+						infoTextString.Append(FString::Printf(TEXT("%s\n"), *player->GetPlayerName()));
+					}
+				}
+				TPSHUD->announcement->infoText->SetText(FText::FromString(infoTextString));
+			}
 		}
 	}
 	ATPSCharacter* character = Cast<ATPSCharacter>(GetPawn());

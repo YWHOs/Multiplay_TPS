@@ -96,7 +96,9 @@ void ATPSCharacter::Destroyed()
 	{
 		elimBotComponent->DestroyComponent();
 	}
-	if (combatComponent && combatComponent->equippedWeapon)
+	ATPSGameMode* gameMode = Cast<ATPSGameMode>(UGameplayStatics::GetGameMode(this));
+
+	if (combatComponent && combatComponent->equippedWeapon && gameMode && gameMode->GetMatchState() != MatchState::InProgress)
 	{
 		combatComponent->equippedWeapon->Destroy();
 	}
@@ -554,6 +556,10 @@ void ATPSCharacter::MulticastElim_Implementation()
 
 	// Input Collision Disable
 	bDisableGameplay = true;
+	if (combatComponent)
+	{
+		combatComponent->FirePressed(false);
+	}
 
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);

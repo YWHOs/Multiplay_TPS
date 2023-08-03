@@ -7,6 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerStart.h"
 #include "Multiplay_TPS/PlayerState/TPSPlayerState.h"
+#include "Multiplay_TPS/GameState/TPSGameState.h"
 
 namespace MatchState
 {
@@ -71,9 +72,12 @@ void ATPSGameMode::PlayerEliminated(ATPSCharacter* _ElimCharacter, ATPSPlayerCon
 	ATPSPlayerState* attackerState = _AttackController ? Cast<ATPSPlayerState>(_AttackController->PlayerState) : nullptr;
 	ATPSPlayerState* victimState = _VictimController ? Cast<ATPSPlayerState>(_VictimController->PlayerState) : nullptr;
 
-	if (attackerState && attackerState != victimState)
+	ATPSGameState* gameState = GetGameState<ATPSGameState>();
+
+	if (attackerState && attackerState != victimState && gameState)
 	{
 		attackerState->AddToScore(1.f);
+		gameState->UpdateTopScore(attackerState);
 	}
 	if (victimState)
 	{
