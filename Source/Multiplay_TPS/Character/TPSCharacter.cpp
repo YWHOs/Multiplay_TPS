@@ -64,6 +64,7 @@ void ATPSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 
 	DOREPLIFETIME_CONDITION(ATPSCharacter, overlappingWeapon, COND_OwnerOnly);
 	DOREPLIFETIME(ATPSCharacter, health);
+	DOREPLIFETIME(ATPSCharacter, bDisableGameplay);
 }
 void ATPSCharacter::TickInit()
 {
@@ -95,6 +96,10 @@ void ATPSCharacter::Destroyed()
 	{
 		elimBotComponent->DestroyComponent();
 	}
+	if (combatComponent && combatComponent->equippedWeapon)
+	{
+		combatComponent->equippedWeapon->Destroy();
+	}
 }
 void ATPSCharacter::UpdateHUDHealth()
 {
@@ -108,21 +113,31 @@ void ATPSCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	RotateInPlace(DeltaTime);
+	HideCamera();
+	TickInit();
+}
+void ATPSCharacter::RotateInPlace(float _DeltaTime)
+{
+	if (bDisableGameplay)
+	{
+		bUseControllerRotationYaw = false;
+		turningInPlace = ETurningInPlace::ETIP_NotTurn;
+		return;
+	}
 	if (GetLocalRole() > ENetRole::ROLE_SimulatedProxy && IsLocallyControlled())
 	{
-		AimOffset(DeltaTime);
+		AimOffset(_DeltaTime);
 	}
 	else
 	{
-		lastMovementReplication += DeltaTime;
+		lastMovementReplication += _DeltaTime;
 		if (lastMovementReplication > 0.25f)
 		{
 			OnRep_ReplicatedMovement();
 		}
 		CalculateAOPitch();
 	}
-	HideCamera();
-	TickInit();
 }
 void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -176,6 +191,7 @@ void ATPSCharacter::PostInitializeComponents()
 
 void ATPSCharacter::MoveForward(float _value)
 {
+	if (bDisableGameplay) return;
 	if (Controller && _value != 0.f)
 	{
 		const FRotator yawRotation(0.f, Controller->GetControlRotation().Yaw, 0.f);
@@ -186,6 +202,7 @@ void ATPSCharacter::MoveForward(float _value)
 
 void ATPSCharacter::MoveRight(float _value)
 {
+	if (bDisableGameplay) return;
 	if (Controller && _value != 0.f)
 	{
 		const FRotator yawRotation(0.f, Controller->GetControlRotation().Yaw, 0.f);
@@ -205,6 +222,7 @@ void ATPSCharacter::LookUp(float _value)
 }
 void ATPSCharacter::Jump()
 {
+	if (bDisableGameplay) return;
 	if (bIsCrouched)
 	{
 		UnCrouch();
@@ -216,6 +234,7 @@ void ATPSCharacter::Jump()
 }
 void ATPSCharacter::EquipPressed()
 {
+	if (bDisableGameplay) return;
 	if (combatComponent)
 	{
 		if (HasAuthority())
@@ -231,6 +250,7 @@ void ATPSCharacter::EquipPressed()
 }
 void ATPSCharacter::CrouchPressed()
 {
+	if (bDisableGameplay) return;
 	if (bIsCrouched)
 	{
 		UnCrouch();
@@ -242,6 +262,7 @@ void ATPSCharacter::CrouchPressed()
 }
 void ATPSCharacter::ReloadPressed()
 {
+	if (bDisableGameplay) return;
 	if (combatComponent)
 	{
 		combatComponent->Reload();
@@ -249,6 +270,7 @@ void ATPSCharacter::ReloadPressed()
 }
 void ATPSCharacter::AimPressed()
 {
+	if (bDisableGameplay) return;
 	if (combatComponent)
 	{
 		combatComponent->SetAiming(true);
@@ -256,6 +278,7 @@ void ATPSCharacter::AimPressed()
 }
 void ATPSCharacter::AimReleased()
 {
+	if (bDisableGameplay) return;
 	if (combatComponent)
 	{
 		combatComponent->SetAiming(false);
@@ -263,6 +286,7 @@ void ATPSCharacter::AimReleased()
 }
 void ATPSCharacter::FirePressed()
 {
+	if (bDisableGameplay) return;
 	if (combatComponent)
 	{
 		combatComponent->FirePressed(true);
@@ -270,6 +294,7 @@ void ATPSCharacter::FirePressed()
 }
 void ATPSCharacter::FireReleased()
 {
+	if (bDisableGameplay) return;
 	if (combatComponent)
 	{
 		combatComponent->FirePressed(false);
@@ -528,12 +553,8 @@ void ATPSCharacter::MulticastElim_Implementation()
 	StartDissolve();
 
 	// Input Collision Disable
-	GetCharacterMovement()->DisableMovement();
-	GetCharacterMovement()->StopMovementImmediately();
-	if (TPSController)
-	{
-		DisableInput(TPSController);
-	}
+	bDisableGameplay = true;
+
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 

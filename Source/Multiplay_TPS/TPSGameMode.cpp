@@ -43,6 +43,14 @@ void ATPSGameMode::Tick(float DeltaTime)
 			SetMatchState(MatchState::Cooldown);
 		}
 	}
+	else if (MatchState == MatchState::Cooldown)
+	{
+		countdownTime = cooldownTime + warmupTime + matchTime - GetWorld()->GetTimeSeconds() + levelStartTime;
+		if (countdownTime <= 0.f)
+		{
+			RestartGame();
+		}
+	}
 }
 void ATPSGameMode::OnMatchStateSet()
 {

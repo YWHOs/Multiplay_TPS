@@ -11,6 +11,7 @@
 #include "Multiplay_TPS/TPSGameMode.h"
 #include "Multiplay_TPS/HUD/Announcement.h"
 #include "Kismet/GameplayStatics.h"
+#include "Multiplay_TPS/Components//CombatComponent.h"
 
 void ATPSPlayerController::BeginPlay()
 {
@@ -313,5 +314,11 @@ void ATPSPlayerController::HandleCooldown()
 			TPSHUD->announcement->announcementText->SetText(FText::FromString(announcementText));
 			TPSHUD->announcement->infoText->SetText(FText());
 		}
+	}
+	ATPSCharacter* character = Cast<ATPSCharacter>(GetPawn());
+	if (character && character->GetCombatComponent())
+	{
+		character->bDisableGameplay = true;
+		character->GetCombatComponent()->FirePressed(false);
 	}
 }

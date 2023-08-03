@@ -31,6 +31,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void FinishReload();
 
+	void FirePressed(bool _bPressed);
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -42,7 +43,6 @@ protected:
 	UFUNCTION()
 	void OnRep_EquippedWeapon();
 
-	void FirePressed(bool _bPressed);
 	void Fire();
 
 	UFUNCTION(Server, Reliable)

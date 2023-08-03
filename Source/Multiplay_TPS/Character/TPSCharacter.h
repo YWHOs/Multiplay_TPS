@@ -46,6 +46,7 @@ protected:
 	UFUNCTION()
 	void ReceiveDamage(AActor* _DamagedActor, float _Damage, const UDamageType* _DamageType, class AController* _InstigatorController, AActor* _DamageCauser);
 	void TickInit();
+	void RotateInPlace(float _DeltaTime);
 
 public:	
 	virtual void Tick(float DeltaTime) override;
@@ -69,6 +70,10 @@ public:
 	virtual void Destroyed() override;
 
 	ECombatState GetCombatState() const;
+
+public:
+	UPROPERTY(Replicated)
+	bool bDisableGameplay = false;
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
@@ -177,4 +182,6 @@ public:
 	FORCEINLINE bool IsElimmed() const { return bElimmed; }
 	FORCEINLINE float GetHealth() const { return health; }
 	FORCEINLINE float GetMaxHealth() const { return maxHealth; }
+	FORCEINLINE UCombatComponent* GetCombatComponent() const { return combatComponent; }
+	FORCEINLINE bool GetDisableGameplay() const { return bDisableGameplay; }
 };
