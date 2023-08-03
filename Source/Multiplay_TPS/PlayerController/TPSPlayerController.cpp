@@ -19,8 +19,6 @@ void ATPSPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ServerCheckMatchState();
-
 	TPSHUD = Cast<ATPSHUD>(GetHUD());
 	ServerCheckMatchState();
 }
@@ -74,10 +72,6 @@ void ATPSPlayerController::ServerCheckMatchState_Implementation()
 		cooldownTime = gameMode->cooldownTime;
 		matchState = gameMode->GetMatchState();
 		ClientJoinGame(matchState, warmupTime, matchTime, levelStartTime, cooldownTime);
-		if (TPSHUD && matchState == MatchState::WaitingToStart)
-		{
-			TPSHUD->AddAnnouncement();
-		}
 	}
 }
 void ATPSPlayerController::ClientJoinGame_Implementation(FName _StateMatch, float _Warmup, float _MatchTime, float _StartTime, float _Cooldown)
@@ -290,13 +284,17 @@ void ATPSPlayerController::OnRep_MatchState()
 	{
 		HandleMatch();
 	}
+	else if (matchState == MatchState::Cooldown)
+	{
+		HandleCooldown();
+	}
 }
 void ATPSPlayerController::HandleMatch()
 {
 	TPSHUD = TPSHUD == nullptr ? Cast<ATPSHUD>(GetHUD()) : TPSHUD;
 	if (TPSHUD)
 	{
-		TPSHUD->AddCharacterOverlay();
+		if (TPSHUD->characterOverlay == nullptr) TPSHUD->AddCharacterOverlay();
 		if (TPSHUD->announcement)
 		{
 			TPSHUD->announcement->SetVisibility(ESlateVisibility::Hidden);

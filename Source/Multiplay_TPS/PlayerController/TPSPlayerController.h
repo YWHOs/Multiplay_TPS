@@ -43,7 +43,7 @@ protected:
 	// 클라이언트 와 서버 싱크 시간
 	UFUNCTION(Server, Reliable)
 	void ServerRequestTime(float _Time);
-	UFUNCTION(Server, Reliable)
+	UFUNCTION(Client, Reliable)
 	void ClientReportTime(float _Time, float _TimeServerRequest);
 	void CheckTimeSync(float _DeltaTime);
 
@@ -53,6 +53,7 @@ protected:
 	void ServerCheckMatchState();
 	UFUNCTION(Client, Reliable)
 	void ClientJoinGame(FName _StateMatch, float _Warmup, float _MatchTime, float _StartTime, float _Cooldown);
+
 protected:
 	// 클라이언트와 서버 시간 차이
 	float clientServerDelta = 0.f;
