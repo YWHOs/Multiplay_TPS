@@ -6,6 +6,10 @@
 #include "GameFramework/GameMode.h"
 #include "TPSGameMode.generated.h"
 
+namespace MatchState
+{
+	extern MULTIPLAY_TPS_API const FName Cooldown;
+}
 /**
  * 
  */
@@ -30,6 +34,8 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	float matchTime = 180.f;
 	float levelStartTime = 0.f;
+	UPROPERTY(EditDefaultsOnly)
+	float cooldownTime = 5.f;
 
 protected:
 	virtual void BeginPlay() override;
@@ -37,4 +43,7 @@ protected:
 
 private:
 	float countdownTime = 0.f;
+
+public:
+	FORCEINLINE float GetCountDown() const { return countdownTime; }
 };

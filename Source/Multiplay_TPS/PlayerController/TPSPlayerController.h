@@ -11,6 +11,7 @@
  */
 class ATPSHUD;
 class UCharacterOverlay;
+class ATPSGameMode;
 
 UCLASS()
 class MULTIPLAY_TPS_API ATPSPlayerController : public APlayerController
@@ -47,10 +48,11 @@ protected:
 	void CheckTimeSync(float _DeltaTime);
 
 	void HandleMatch();
+	void HandleCooldown();
 	UFUNCTION(Server, Reliable)
 	void ServerCheckMatchState();
 	UFUNCTION(Client, Reliable)
-	void ClientJoinGame(FName _StateMatch, float _Warmup, float _MatchTime, float _StartTime);
+	void ClientJoinGame(FName _StateMatch, float _Warmup, float _MatchTime, float _StartTime, float _Cooldown);
 protected:
 	// 클라이언트와 서버 시간 차이
 	float clientServerDelta = 0.f;
@@ -64,10 +66,13 @@ private:
 private:
 	UPROPERTY()
 	ATPSHUD* TPSHUD;
+	UPROPERTY()
+	ATPSGameMode* TPSGameMode;
 
 	float levelStartTime = 0.f;
 	float matchTime = 0.f;
 	float warmupTime = 0.f;
+	float cooldownTime = 0.f;
 	uint32 countdown = 0;
 
 	UPROPERTY(ReplicatedUsing = OnRep_MatchState)

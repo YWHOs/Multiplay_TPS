@@ -8,6 +8,10 @@
 #include "GameFramework/PlayerStart.h"
 #include "Multiplay_TPS/PlayerState/TPSPlayerState.h"
 
+namespace MatchState
+{
+	const FName Cooldown = FName("Cooldown");
+}
 ATPSGameMode::ATPSGameMode()
 {
 	bDelayedStart = true;
@@ -29,6 +33,14 @@ void ATPSGameMode::Tick(float DeltaTime)
 		if (countdownTime <= 0.f)
 		{
 			StartMatch();
+		}
+	}
+	else if (MatchState == MatchState::InProgress)
+	{
+		countdownTime = warmupTime + matchTime - GetWorld()->GetTimeSeconds() + levelStartTime;
+		if (countdownTime <= 0.f)
+		{
+			SetMatchState(MatchState::Cooldown);
 		}
 	}
 }
