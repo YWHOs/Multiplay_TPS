@@ -107,6 +107,9 @@ private:
 	UPROPERTY(EditAnywhere)
 	int32 startAmmo = 30;
 
+	UPROPERTY(EditAnywhere)
+	int32 startRocketAmmo = 0;
+
 	UPROPERTY(ReplicatedUsing = OnRep_CombatState)
 	ECombatState combatState = ECombatState::ECS_Unoccupied;
 

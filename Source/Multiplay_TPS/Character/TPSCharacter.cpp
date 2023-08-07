@@ -553,9 +553,9 @@ void ATPSCharacter::MulticastElim_Implementation()
 		dynamicInstanceDissolve->SetScalarParameterValue(TEXT("Glow"), 200.f);
 	}
 	StartDissolve();
-
 	// Input Collision Disable
 	bDisableGameplay = true;
+	GetCharacterMovement()->DisableMovement();
 	if (combatComponent)
 	{
 		combatComponent->FirePressed(false);

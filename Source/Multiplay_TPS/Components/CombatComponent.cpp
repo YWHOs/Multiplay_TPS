@@ -47,6 +47,7 @@ void UCombatComponent::BeginPlay()
 void UCombatComponent::InitializeCarriedAmmo()
 {
 	carriedAmmoMap.Emplace(EWeaponType::EWT_Rifle, startAmmo);
+	carriedAmmoMap.Emplace(EWeaponType::EWT_RocketLauncher, startRocketAmmo);
 }
 // Called every frame
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
