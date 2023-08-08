@@ -38,9 +38,11 @@ protected:
 	UPROPERTY(EditAnywhere)
 	class UBoxComponent* collisionBox;
 
-private:
 	UPROPERTY(VisibleAnywhere)
 	class UProjectileMovementComponent* projectileMovementComponent;
+
+private:
+
 
 	UPROPERTY(EditAnywhere)
 	class UParticleSystem* tracer;

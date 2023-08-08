@@ -329,6 +329,9 @@ void ATPSCharacter::PlayReloadMontage()
 		case EWeaponType::EWT_Rifle:
 			sectionName = FName("Rifle");
 			break;
+		case EWeaponType::EWT_RocketLauncher:
+			sectionName = FName("Rifle");
+			break;
 		}
 		animInstance->Montage_JumpToSection(sectionName);
 	}

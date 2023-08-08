@@ -11,6 +11,7 @@
  */
 class UNiagaraSystem;
 class UNiagaraComponent;
+class URocketMovementComponent;
 
 UCLASS()
 class MULTIPLAY_TPS_API AProjectileRocket : public AProjectile
@@ -42,6 +43,9 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	USoundAttenuation* loopSoundAttenuation;
+
+	UPROPERTY(VisibleAnywhere)
+	URocketMovementComponent* movementComponent;
 
 
 private:
