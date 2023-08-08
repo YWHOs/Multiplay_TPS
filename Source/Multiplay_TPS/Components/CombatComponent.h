@@ -104,11 +104,13 @@ private:
 	UPROPERTY(ReplicatedUsing = OnRep_CarriedAmmo)
 	int32 carriedAmmo;
 	TMap<EWeaponType, int32> carriedAmmoMap;
-	UPROPERTY(EditAnywhere)
-	int32 startAmmo = 30;
 
 	UPROPERTY(EditAnywhere)
+	int32 startAmmo = 30;
+	UPROPERTY(EditAnywhere)
 	int32 startRocketAmmo = 0;
+	UPROPERTY(EditAnywhere)
+	int32 startPistolAmmo = 0;
 
 	UPROPERTY(ReplicatedUsing = OnRep_CombatState)
 	ECombatState combatState = ECombatState::ECS_Unoccupied;
