@@ -9,6 +9,9 @@
 /**
  * 
  */
+class UNiagaraSystem;
+class UNiagaraComponent;
+
 UCLASS()
 class MULTIPLAY_TPS_API AProjectileRocket : public AProjectile
 {
@@ -16,24 +19,37 @@ class MULTIPLAY_TPS_API AProjectileRocket : public AProjectile
 	
 public:
 	AProjectileRocket();
+	virtual void Destroyed() override;
 
 protected:
 	virtual void OnHit(UPrimitiveComponent* _HitComp, AActor* _OtherActor, UPrimitiveComponent* _OtherComp, FVector _NormalImpulse, const FHitResult& _Hit) override;
-	//virtual void BeginPlay() override;
+	virtual void BeginPlay() override;
+	void DestroyTimerFinished();
+
+protected:
 
 	UPROPERTY(EditAnywhere)
-		USoundCue* ProjectileLoop;
+	UNiagaraSystem* trailSystem;
 
 	UPROPERTY()
-		UAudioComponent* ProjectileLoopComponent;
+	UNiagaraComponent* trailSystemComponent;
+	
+	UPROPERTY(EditAnywhere)
+	USoundCue* projectileLoop;
+
+	UPROPERTY()
+	UAudioComponent* projectileLoopComponent;
 
 	UPROPERTY(EditAnywhere)
-		USoundAttenuation* LoopingSoundAttenuation;
+	USoundAttenuation* loopSoundAttenuation;
 
-	//UPROPERTY(VisibleAnywhere)
-		//class URocketMovementComponent* RocketMovementComponent;
 
 private:
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* rocketMesh;
+
+	FTimerHandle destroyTimer;
+
+	UPROPERTY(EditAnywhere)
+	float destroyTime = 3.f;
 };
