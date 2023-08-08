@@ -94,6 +94,12 @@ void AWeapon::SetWeaponState(EWeaponState State)
 		weaponMesh->SetSimulatePhysics(false);
 		weaponMesh->SetEnableGravity(false);
 		weaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		if (weaponType == EWeaponType::EWT_SubmachineGun)
+		{
+			weaponMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+			weaponMesh->SetEnableGravity(true);
+			weaponMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+		}
 		break;
 	case EWeaponState::EWS_Dropped:
 		if (HasAuthority())
@@ -103,6 +109,9 @@ void AWeapon::SetWeaponState(EWeaponState State)
 		weaponMesh->SetSimulatePhysics(true);
 		weaponMesh->SetEnableGravity(true);
 		weaponMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		weaponMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
+		weaponMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
+		weaponMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 		break;
 	}
 
@@ -116,11 +125,20 @@ void AWeapon::OnRep_WeaponState()
 			weaponMesh->SetSimulatePhysics(false);
 			weaponMesh->SetEnableGravity(false);
 			weaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			if (weaponType == EWeaponType::EWT_SubmachineGun)
+			{
+				weaponMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+				weaponMesh->SetEnableGravity(true);
+				weaponMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+			}
 			break;
 	case EWeaponState::EWS_Dropped:
 		weaponMesh->SetSimulatePhysics(true);
 		weaponMesh->SetEnableGravity(true);
 		weaponMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		weaponMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
+		weaponMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
+		weaponMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 		break;
 	}
 }

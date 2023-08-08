@@ -9,7 +9,6 @@
 #include "Multiplay_TPS/TPSTypes/CombatState.h"
 #include "CombatComponent.generated.h"
 
-#define TRACE_LENGTH 80000.f;
 
 class AWeapon;
 
@@ -112,7 +111,9 @@ private:
 	UPROPERTY(EditAnywhere)
 	int32 startPistolAmmo = 6;
 	UPROPERTY(EditAnywhere)
-	int32 startSMGAmmo = 6;
+	int32 startSMGAmmo = 10;
+	UPROPERTY(EditAnywhere)
+	int32 startShotgunAmmo = 0;
 
 	UPROPERTY(ReplicatedUsing = OnRep_CombatState)
 	ECombatState combatState = ECombatState::ECS_Unoccupied;

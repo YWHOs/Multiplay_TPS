@@ -7,6 +7,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "particles/ParticleSystemComponent.h"
 #include "Sound/SoundCue.h"
+#include "WeaponTypes.h"
+#include "Kismet/KismetMathLibrary.h"
 
 void AHitScanWeapon::Fire(const FVector& HitTarget)
 {
@@ -65,4 +67,15 @@ void AHitScanWeapon::Fire(const FVector& HitTarget)
 			UGameplayStatics::PlaySoundAtLocation(this, fireSound, GetActorLocation());
 		}
 	}
+}
+
+FVector AHitScanWeapon::TraceEnd(const FVector& _Start, const FVector& _Target)
+{
+	FVector toTarget = (_Target - _Start).GetSafeNormal();
+	FVector sphereCenter = _Start + toTarget * distanceToSphere;
+	FVector randVec = UKismetMathLibrary::RandomUnitVector() * FMath::FRandRange(0.f, sphereRadius);
+	FVector end = sphereCenter + randVec;
+	FVector toEnd = end - _Start;
+
+	return FVector(_Start + toEnd * TRACE_LENGTH / toEnd.Size());
 }

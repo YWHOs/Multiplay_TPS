@@ -338,6 +338,9 @@ void ATPSCharacter::PlayReloadMontage()
 		case EWeaponType::EWT_SubmachineGun:
 			sectionName = FName("Rifle");
 			break;
+		case EWeaponType::EWT_Shotgun:
+			sectionName = FName("Rifle");
+			break;
 		}
 		animInstance->Montage_JumpToSection(sectionName);
 	}
