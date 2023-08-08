@@ -5,6 +5,8 @@
 #include "Engine/SkeletalMeshSocket.h"
 #include "Multiplay_TPS/Character/TPSCharacter.h"
 #include "Kismet/GameplayStatics.h"
+#include "particles/ParticleSystemComponent.h"
+#include "Sound/SoundCue.h"
 
 void AHitScanWeapon::Fire(const FVector& HitTarget)
 {
@@ -27,21 +29,40 @@ void AHitScanWeapon::Fire(const FVector& HitTarget)
 		if (world)
 		{
 			world->LineTraceSingleByChannel(fireHit, start, end, ECollisionChannel::ECC_Visibility);
+			FVector beamEnd = end;
 			if (fireHit.bBlockingHit)
 			{
+				beamEnd = fireHit.ImpactPoint;
 				ATPSCharacter* character = Cast<ATPSCharacter>(fireHit.GetActor());
-				if (character)
+				if (character && HasAuthority() && instigatorController)
 				{
-					if (HasAuthority())
-					{
-						UGameplayStatics::ApplyDamage(character, damage, instigatorController, this, UDamageType::StaticClass());
-					}
+					UGameplayStatics::ApplyDamage(character, damage, instigatorController, this, UDamageType::StaticClass());
 				}
 				if (impactParticle)
 				{
 					UGameplayStatics::SpawnEmitterAtLocation(world, impactParticle, fireHit.ImpactPoint, fireHit.ImpactNormal.Rotation());
 				}
+				if (hitSound)
+				{
+					UGameplayStatics::PlaySoundAtLocation(this, hitSound, fireHit.ImpactPoint);
+				}
 			}
+			if (beamParticle)
+			{
+				UParticleSystemComponent* beam = UGameplayStatics::SpawnEmitterAtLocation(world, beamParticle, socketTransform);
+				if (beam)
+				{
+					beam->SetVectorParameter(FName("Target"), beamEnd);
+				}
+			}
+		}
+		if (muzzleFlash)
+		{
+			UGameplayStatics::SpawnEmitterAtLocation(world, muzzleFlash, socketTransform);
+		}
+		if (fireSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, fireSound, GetActorLocation());
 		}
 	}
 }
