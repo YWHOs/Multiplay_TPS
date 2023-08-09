@@ -19,5 +19,5 @@ public:
 
 private:
 	UPROPERTY(EditAnywhere)
-	uint32 pellets = 10;
+	uint32 pellets = 8;
 };

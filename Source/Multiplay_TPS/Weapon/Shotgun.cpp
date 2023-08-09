@@ -22,9 +22,43 @@ void AShotgun::Fire(const FVector& HitTarget)
 		FTransform socketTransform = muzzleSocket->GetSocketTransform(GetWeaponMesh());
 
 		FVector start = socketTransform.GetLocation();
+
+		TMap<ATPSCharacter*, uint32> hitMap;
 		for (uint32 i = 0; i < pellets; i++)
 		{
-			FVector end = TraceEnd(start, HitTarget);
+			FHitResult fireHit;
+			WeaponTraceHit(start, HitTarget, fireHit);
+
+			ATPSCharacter* character = Cast<ATPSCharacter>(fireHit.GetActor());
+			if (character && HasAuthority() && instigatorController)
+			{
+				if (hitMap.Contains(character))
+				{
+					hitMap[character]++;
+				}
+				else
+				{
+					hitMap.Emplace(character, 1);
+				}
+			}
+			if (impactParticle)
+			{
+				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), impactParticle, fireHit.ImpactPoint, fireHit.ImpactNormal.Rotation());
+			}
+			if (hitSound)
+			{
+				UGameplayStatics::PlaySoundAtLocation(this, hitSound, fireHit.ImpactPoint, .5f, FMath::FRandRange(-.5f, .5f));
+			}
+		}
+		for (auto hitPair : hitMap)
+		{
+			if (instigatorController)
+			{
+				if (hitPair.Key && HasAuthority() && instigatorController)
+				{
+					UGameplayStatics::ApplyDamage(hitPair.Key, damage * hitPair.Value, instigatorController, this, UDamageType::StaticClass());
+				}
+			}
 		}
 	}
 }
