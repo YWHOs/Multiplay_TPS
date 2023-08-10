@@ -154,11 +154,17 @@ void UCombatComponent::SetHUDCrosshairs(float _DeltaTime)
 
 void UCombatComponent::SetAiming(bool _bIsAiming)
 {
+	if (character == nullptr || equippedWeapon == nullptr) return;
 	bAiming = _bIsAiming;
 	ServerSetAiming(_bIsAiming);
 	if (character)
 	{
 		character->GetCharacterMovement()->MaxWalkSpeed = _bIsAiming ? aimWalkSpeed : baseWalkSpeed;
+	}
+	// Sniper Widget
+	if (character->IsLocallyControlled() && equippedWeapon->GetWeaponType() == EWeaponType::EWT_Sniper)
+	{
+		character->ShowSniperScope(_bIsAiming);
 	}
 }
 void UCombatComponent::ServerSetAiming_Implementation(bool _bIsAiming)

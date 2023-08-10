@@ -589,6 +589,11 @@ void ATPSCharacter::MulticastElim_Implementation()
 	{
 		UGameplayStatics::SpawnSoundAtLocation(this, elimBotSound, GetActorLocation());
 	}
+	// SniperScope Hide
+	if (IsLocallyControlled() && combatComponent && combatComponent->bAiming && combatComponent->equippedWeapon && combatComponent->equippedWeapon->GetWeaponType() == EWeaponType::EWT_Sniper)
+	{
+		ShowSniperScope(false);
+	}
 }
 void ATPSCharacter::ElimTimerFinish()
 {

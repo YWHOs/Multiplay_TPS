@@ -71,6 +71,9 @@ public:
 
 	ECombatState GetCombatState() const;
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void ShowSniperScope(bool _bShow);
+
 public:
 	UPROPERTY(Replicated)
 	bool bDisableGameplay = false;
