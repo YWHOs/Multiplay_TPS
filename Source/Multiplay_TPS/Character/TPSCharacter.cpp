@@ -330,22 +330,22 @@ void ATPSCharacter::PlayReloadMontage()
 			sectionName = FName("Rifle");
 			break;
 		case EWeaponType::EWT_RocketLauncher:
-			sectionName = FName("Rifle");
+			sectionName = FName("RocketLauncher");
 			break;
 		case EWeaponType::EWT_Pistol:
-			sectionName = FName("Rifle");
+			sectionName = FName("Pistol");
 			break;
 		case EWeaponType::EWT_SubmachineGun:
-			sectionName = FName("Rifle");
+			sectionName = FName("Pistol");
 			break;
 		case EWeaponType::EWT_Shotgun:
-			sectionName = FName("Rifle");
+			sectionName = FName("Shotgun");
 			break;
 		case EWeaponType::EWT_Sniper:
-			sectionName = FName("Rifle");
+			sectionName = FName("Sniper");
 			break;
 		case EWeaponType::EWT_Grenade:
-			sectionName = FName("Rifle");
+			sectionName = FName("Grenade");
 			break;
 		}
 		animInstance->Montage_JumpToSection(sectionName);
