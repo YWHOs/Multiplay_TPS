@@ -9,8 +9,7 @@
 /**
  * 
  */
-class UNiagaraSystem;
-class UNiagaraComponent;
+
 class URocketMovementComponent;
 
 UCLASS()
@@ -25,15 +24,8 @@ public:
 protected:
 	virtual void OnHit(UPrimitiveComponent* _HitComp, AActor* _OtherActor, UPrimitiveComponent* _OtherComp, FVector _NormalImpulse, const FHitResult& _Hit) override;
 	virtual void BeginPlay() override;
-	void DestroyTimerFinished();
 
 protected:
-
-	UPROPERTY(EditAnywhere)
-	UNiagaraSystem* trailSystem;
-
-	UPROPERTY()
-	UNiagaraComponent* trailSystemComponent;
 	
 	UPROPERTY(EditAnywhere)
 	USoundCue* projectileLoop;
@@ -49,11 +41,6 @@ protected:
 
 
 private:
-	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* rocketMesh;
 
-	FTimerHandle destroyTimer;
 
-	UPROPERTY(EditAnywhere)
-	float destroyTime = 3.f;
 };

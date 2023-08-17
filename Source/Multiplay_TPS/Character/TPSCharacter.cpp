@@ -344,6 +344,9 @@ void ATPSCharacter::PlayReloadMontage()
 		case EWeaponType::EWT_Sniper:
 			sectionName = FName("Rifle");
 			break;
+		case EWeaponType::EWT_Grenade:
+			sectionName = FName("Rifle");
+			break;
 		}
 		animInstance->Montage_JumpToSection(sectionName);
 	}

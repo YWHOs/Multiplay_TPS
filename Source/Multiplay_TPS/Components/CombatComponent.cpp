@@ -52,6 +52,7 @@ void UCombatComponent::InitializeCarriedAmmo()
 	carriedAmmoMap.Emplace(EWeaponType::EWT_SubmachineGun, startSMGAmmo);
 	carriedAmmoMap.Emplace(EWeaponType::EWT_Shotgun, startShotgunAmmo);
 	carriedAmmoMap.Emplace(EWeaponType::EWT_Sniper, startSniperAmmo);
+	carriedAmmoMap.Emplace(EWeaponType::EWT_Grenade, startGrenadeAmmo);
 }
 // Called every frame
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
