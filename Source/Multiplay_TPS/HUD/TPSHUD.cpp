@@ -64,10 +64,6 @@ void ATPSHUD::DrawHUD()
 			FVector2D spread(0.f, spreadScaled);
 			DrawCrosshair(HUDPackage.crosshairBottom, viewportCenter, spread, HUDPackage.crosshairColor);
 		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("text"));
-		}
 	}
 }
 

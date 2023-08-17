@@ -31,6 +31,11 @@ public:
 	void FinishReload();
 
 	void FirePressed(bool _bPressed);
+
+	UFUNCTION(BlueprintCallable)
+	void ShotgunShellReload();
+	void JumpToShotgunEnd();
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -137,6 +142,7 @@ private:
 	UFUNCTION()
 	void OnRep_CombatState();
 	void UpdateAmmo();
+	void UpdateShotgunAmmo();
 
 public:	
 	FORCEINLINE ATPSCharacter* GetCharacter() { return character; }

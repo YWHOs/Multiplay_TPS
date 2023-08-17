@@ -41,6 +41,7 @@ public:
 	virtual void Fire(const FVector& HitTarget);
 	void Dropped();
 	bool IsAmmoEmpty();
+	bool IsAmmoFull();
 	void AddAmmo(int32 _Ammo);
 
 public:

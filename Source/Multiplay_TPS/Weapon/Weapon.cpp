@@ -11,6 +11,7 @@
 #include "BulletShell.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "Multiplay_TPS/PlayerController/TPSPlayerController.h"
+#include "Multiplay_TPS/Components/CombatComponent.h"
 
 // Sets default values
 AWeapon::AWeapon()
@@ -156,6 +157,11 @@ void AWeapon::SetHUDAmmo()
 }
 void AWeapon::OnRep_Ammo()
 {
+	TPSCharacter = TPSCharacter == nullptr ? Cast<ATPSCharacter>(GetOwner()) : TPSCharacter;
+	if (TPSCharacter && TPSCharacter->GetCombatComponent() && IsAmmoFull())
+	{
+		TPSCharacter->GetCombatComponent()->JumpToShotgunEnd();
+	}
 	SetHUDAmmo();
 }
 void AWeapon::AddAmmo(int32 _Ammo)
@@ -226,4 +232,8 @@ void AWeapon::Dropped()
 bool AWeapon::IsAmmoEmpty()
 {
 	return ammo <= 0;
+}
+bool AWeapon::IsAmmoFull()
+{
+	return ammo == magCapacity;
 }

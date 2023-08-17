@@ -13,6 +13,7 @@
 #include "Camera/CameraComponent.h"
 #include "TimerManager.h"
 #include "Sound/SoundCue.h"
+#include "Multiplay_TPS/Character/TPSAnimInstance.h"
 
 // Sets default values for this component's properties
 UCombatComponent::UCombatComponent()
@@ -201,6 +202,11 @@ void UCombatComponent::OnRep_CarriedAmmo()
 	{
 		controller->SetHUDCarriedAmmo(carriedAmmo);
 	}
+	bool bJumpToShotgunEnd = combatState == ECombatState::ECS_Reloading && equippedWeapon != nullptr && equippedWeapon->GetWeaponType() == EWeaponType::EWT_Shotgun && carriedAmmo == 0;
+	if (bJumpToShotgunEnd)
+	{
+		JumpToShotgunEnd();
+	}
 }
 void UCombatComponent::StartFireTimer()
 {
@@ -252,6 +258,13 @@ void UCombatComponent::MulticastFire_Implementation(const FVector_NetQuantize& _
 {
 	// 모든 클라이언트에서 사용가능
 	if (equippedWeapon == nullptr) return;
+	if (character && combatState == ECombatState::ECS_Reloading && equippedWeapon->GetWeaponType() == EWeaponType::EWT_Shotgun)
+	{
+		character->PlayFireMontage(bAiming);
+		equippedWeapon->Fire(_TraceHitTarget);
+		combatState = ECombatState::ECS_Unoccupied;
+		return;
+	}
 	if (character && combatState == ECombatState::ECS_Unoccupied)
 	{
 		character->PlayFireMontage(bAiming);
@@ -384,6 +397,13 @@ void UCombatComponent::FinishReload()
 		Fire();
 	}
 }
+void UCombatComponent::ShotgunShellReload()
+{
+	if (character && character->HasAuthority())
+	{
+		UpdateShotgunAmmo();
+	}
+}
 void UCombatComponent::UpdateAmmo()
 {
 	if (character == nullptr || equippedWeapon == nullptr) return;
@@ -399,6 +419,37 @@ void UCombatComponent::UpdateAmmo()
 		controller->SetHUDCarriedAmmo(carriedAmmo);
 	}
 	equippedWeapon->AddAmmo(-reloadAmount);
+}
+void UCombatComponent::UpdateShotgunAmmo()
+{
+	if (character == nullptr || equippedWeapon == nullptr) return;
+
+	if (carriedAmmoMap.Contains(equippedWeapon->GetWeaponType()))
+	{
+		carriedAmmoMap[equippedWeapon->GetWeaponType()] -= 1;
+		carriedAmmo = carriedAmmoMap[equippedWeapon->GetWeaponType()];
+	}
+
+	controller = controller == nullptr ? Cast<ATPSPlayerController>(character->Controller) : controller;
+	if (controller)
+	{
+		controller->SetHUDCarriedAmmo(carriedAmmo);
+	}
+	equippedWeapon->AddAmmo(-1);
+
+	if (equippedWeapon->IsAmmoFull() || carriedAmmo == 0)
+	{
+		JumpToShotgunEnd();
+	}
+}
+void UCombatComponent::JumpToShotgunEnd()
+{
+	// 노티 ShotgunEnd 날리기
+	UAnimInstance* animInstance = character->GetMesh()->GetAnimInstance();
+	if (animInstance && character->GetReloadMontage())
+	{
+		animInstance->Montage_JumpToSection(FName("ShotgunEnd"));
+	}
 }
 void UCombatComponent::ServerReload_Implementation()
 {
@@ -429,5 +480,6 @@ void UCombatComponent::OnRep_CombatState()
 bool UCombatComponent::CanFire()
 {
 	if (equippedWeapon == nullptr) return false;
+	if (!equippedWeapon->IsAmmoEmpty() && bCanFire && combatState == ECombatState::ECS_Reloading && equippedWeapon->GetWeaponType() == EWeaponType::EWT_Shotgun) return true;
 	return !equippedWeapon->IsAmmoEmpty() && bCanFire && combatState == ECombatState::ECS_Unoccupied;
 }
