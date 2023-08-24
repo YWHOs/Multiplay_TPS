@@ -326,6 +326,7 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 void UCombatComponent::EquipWeapon(AWeapon* _WeaponToEquip)
 {
 	if (character == nullptr || _WeaponToEquip == nullptr) return;
+	if (combatState != ECombatState::ECS_Unoccupied) return;
 	if (equippedWeapon)
 	{
 		equippedWeapon->Dropped();
@@ -363,9 +364,35 @@ void UCombatComponent::EquipWeapon(AWeapon* _WeaponToEquip)
 	character->GetCharacterMovement()->bOrientRotationToMovement = false;
 	character->bUseControllerRotationYaw = true;
 }
+void UCombatComponent::ThrowGrenade()
+{
+	if (combatState != ECombatState::ECS_Unoccupied) return;
+	combatState = ECombatState::ECS_ThrowingGrenade;
+	if (character)
+	{
+		character->PlayThrowGrenadeMontage();
+	}
+	if (character && !character->HasAuthority())
+	{
+		ServerThrowGrenade();
+	}
+
+}
+void UCombatComponent::ServerThrowGrenade_Implementation()
+{
+	combatState = ECombatState::ECS_ThrowingGrenade;
+	if (character)
+	{
+		character->PlayThrowGrenadeMontage();
+	}
+}
+void UCombatComponent::ThrowGrenadeFinished()
+{
+	combatState = ECombatState::ECS_Unoccupied;
+}
 void UCombatComponent::Reload()
 {
-	if (carriedAmmo > 0 && combatState != ECombatState::ECS_Reloading)
+	if (carriedAmmo > 0 && combatState == ECombatState::ECS_Unoccupied)
 	{
 		ServerReload();
 	}
@@ -473,6 +500,12 @@ void UCombatComponent::OnRep_CombatState()
 		if (bFirePressed)
 		{
 			Fire();
+		}
+		break;
+	case ECombatState::ECS_ThrowingGrenade:
+		if (character && !character->IsLocallyControlled())
+		{
+			character->PlayThrowGrenadeMontage();
 		}
 		break;
 	}

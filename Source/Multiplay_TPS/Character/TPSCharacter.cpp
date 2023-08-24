@@ -159,6 +159,7 @@ void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &ATPSCharacter::ReloadPressed);
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ATPSCharacter::FirePressed);
 	PlayerInputComponent->BindAction("Fire", IE_Released, this, &ATPSCharacter::FireReleased);
+	PlayerInputComponent->BindAction("ThrowGrenade", IE_Pressed, this, &ATPSCharacter::GrenadeButtonPressed);
 }
 void ATPSCharacter::HideCamera()
 {
@@ -535,6 +536,21 @@ void ATPSCharacter::ReceiveDamage(AActor* _DamagedActor, float _Damage, const UD
 		}
 	}
 
+}
+void ATPSCharacter::GrenadeButtonPressed()
+{
+	if (combatComponent)
+	{
+		combatComponent->ThrowGrenade();
+	}
+}
+void ATPSCharacter::PlayThrowGrenadeMontage()
+{
+	UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
+	if (animInstance && throwGrenadeMontage)
+	{
+		animInstance->Montage_Play(throwGrenadeMontage);
+	}
 }
 void ATPSCharacter::PlayElimMontage()
 {

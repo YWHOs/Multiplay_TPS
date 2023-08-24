@@ -47,6 +47,7 @@ protected:
 	void ReceiveDamage(AActor* _DamagedActor, float _Damage, const UDamageType* _DamageType, class AController* _InstigatorController, AActor* _DamageCauser);
 	void TickInit();
 	void RotateInPlace(float _DeltaTime);
+	void GrenadeButtonPressed();
 
 public:	
 	virtual void Tick(float DeltaTime) override;
@@ -56,6 +57,7 @@ public:
 	void PlayFireMontage(bool bAiming);
 	void PlayReloadMontage();
 	void PlayElimMontage();
+	void PlayThrowGrenadeMontage();
 	virtual void OnRep_ReplicatedMovement() override;
 	void Elim();
 	UFUNCTION(NetMulticast, Reliable)
@@ -109,6 +111,8 @@ private:
 	UAnimMontage* hitReactMontage;
 	UPROPERTY(EditAnywhere, Category = Combat)
 	UAnimMontage* elimMontage;
+	UPROPERTY(EditAnywhere, Category = Combat)
+	UAnimMontage* throwGrenadeMontage;
 
 	UPROPERTY(EditAnywhere)
 	float cameraThreshold = 200.f;
