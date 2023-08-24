@@ -66,6 +66,13 @@ protected:
 	void ThrowGrenade();
 	UFUNCTION(Server, Reliable)
 	void ServerThrowGrenade();
+
+	void DropEquipeedWeapon();
+	void AttachActorToRightHand(AActor* _ActorToAttach);
+	void AttachActorToLeftHand(AActor* _ActorToAttach);
+	void UpdateCarriedAmmo();
+	void PlayEquipWeaponSound();
+	void ReloadEmptyWeapon();
 private:
 	UPROPERTY()
 	class ATPSCharacter* character;

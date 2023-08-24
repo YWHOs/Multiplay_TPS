@@ -182,17 +182,10 @@ void UCombatComponent::OnRep_EquippedWeapon()
 	if (equippedWeapon && character)
 	{
 		equippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
-		const USkeletalMeshSocket* handSocket = character->GetMesh()->GetSocketByName(FName("RightHandSocket"));
-		if (handSocket)
-		{
-			handSocket->AttachActor(equippedWeapon, character->GetMesh());
-		}
+		AttachActorToRightHand(equippedWeapon);
 		character->GetCharacterMovement()->bOrientRotationToMovement = false;
 		character->bUseControllerRotationYaw = true;
-		if (equippedWeapon->equipSound)
-		{
-			UGameplayStatics::PlaySoundAtLocation(this, equippedWeapon->equipSound, character->GetActorLocation());
-		}
+		PlayEquipWeaponSound();
 	}
 }
 void UCombatComponent::OnRep_CarriedAmmo()
@@ -221,10 +214,7 @@ void UCombatComponent::FireTimerFinish()
 	{
 		Fire();
 	}
-	if (equippedWeapon->IsAmmoEmpty())
-	{
-		Reload();
-	}
+	ReloadEmptyWeapon();
 }
 void UCombatComponent::FirePressed(bool _bPressed)
 {
@@ -327,20 +317,52 @@ void UCombatComponent::EquipWeapon(AWeapon* _WeaponToEquip)
 {
 	if (character == nullptr || _WeaponToEquip == nullptr) return;
 	if (combatState != ECombatState::ECS_Unoccupied) return;
+
+	DropEquipeedWeapon();
+	equippedWeapon = _WeaponToEquip;
+	equippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
+
+	AttachActorToRightHand(equippedWeapon);
+	equippedWeapon->SetOwner(character);
+	equippedWeapon->SetHUDAmmo();
+
+	UpdateCarriedAmmo();
+	PlayEquipWeaponSound();
+	ReloadEmptyWeapon();
+
+	character->GetCharacterMovement()->bOrientRotationToMovement = false;
+	character->bUseControllerRotationYaw = true;
+}
+void UCombatComponent::DropEquipeedWeapon()
+{
 	if (equippedWeapon)
 	{
 		equippedWeapon->Dropped();
 	}
-	equippedWeapon = _WeaponToEquip;
-	equippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
+}
+void UCombatComponent::AttachActorToRightHand(AActor* _ActorToAttach)
+{
+	if (character == nullptr || character->GetMesh() == nullptr || _ActorToAttach == nullptr) return;
 	const USkeletalMeshSocket* handSocket = character->GetMesh()->GetSocketByName(FName("RightHandSocket"));
 	if (handSocket)
 	{
-		handSocket->AttachActor(equippedWeapon, character->GetMesh());
+		handSocket->AttachActor(_ActorToAttach, character->GetMesh());
 	}
-	equippedWeapon->SetOwner(character);
-	equippedWeapon->SetHUDAmmo();
-
+}
+void UCombatComponent::AttachActorToLeftHand(AActor* _ActorToAttach)
+{
+	if (character == nullptr || character->GetMesh() == nullptr || _ActorToAttach == nullptr || equippedWeapon == nullptr) return;
+	bool bUsePistolSocket = equippedWeapon->GetWeaponType() == EWeaponType::EWT_Pistol || equippedWeapon->GetWeaponType() == EWeaponType::EWT_SubmachineGun;
+	FName socketName = bUsePistolSocket ? FName("PistolSocket") : FName("LeftHandSocket");
+	const USkeletalMeshSocket* handSocket = character->GetMesh()->GetSocketByName(socketName);
+	if (handSocket)
+	{
+		handSocket->AttachActor(_ActorToAttach, character->GetMesh());
+	}
+}
+void UCombatComponent::UpdateCarriedAmmo()
+{
+	if (equippedWeapon == nullptr) return;
 	if (carriedAmmoMap.Contains(equippedWeapon->GetWeaponType()))
 	{
 		carriedAmmo = carriedAmmoMap[equippedWeapon->GetWeaponType()];
@@ -350,19 +372,20 @@ void UCombatComponent::EquipWeapon(AWeapon* _WeaponToEquip)
 	{
 		controller->SetHUDCarriedAmmo(carriedAmmo);
 	}
-	//사운드
-	if (equippedWeapon->equipSound)
+}
+void UCombatComponent::PlayEquipWeaponSound()
+{
+	if (character && equippedWeapon && equippedWeapon->equipSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, equippedWeapon->equipSound, character->GetActorLocation());
 	}
-	// 재장전
-	if (equippedWeapon->IsAmmoEmpty())
+}
+void UCombatComponent::ReloadEmptyWeapon()
+{
+	if (equippedWeapon && equippedWeapon->IsAmmoEmpty())
 	{
 		Reload();
 	}
-
-	character->GetCharacterMovement()->bOrientRotationToMovement = false;
-	character->bUseControllerRotationYaw = true;
 }
 void UCombatComponent::ThrowGrenade()
 {
@@ -371,6 +394,7 @@ void UCombatComponent::ThrowGrenade()
 	if (character)
 	{
 		character->PlayThrowGrenadeMontage();
+		AttachActorToLeftHand(equippedWeapon);
 	}
 	if (character && !character->HasAuthority())
 	{
@@ -384,11 +408,13 @@ void UCombatComponent::ServerThrowGrenade_Implementation()
 	if (character)
 	{
 		character->PlayThrowGrenadeMontage();
+		AttachActorToLeftHand(equippedWeapon);
 	}
 }
 void UCombatComponent::ThrowGrenadeFinished()
 {
 	combatState = ECombatState::ECS_Unoccupied;
+	AttachActorToRightHand(equippedWeapon);
 }
 void UCombatComponent::Reload()
 {
@@ -506,6 +532,7 @@ void UCombatComponent::OnRep_CombatState()
 		if (character && !character->IsLocallyControlled())
 		{
 			character->PlayThrowGrenadeMontage();
+			AttachActorToLeftHand(equippedWeapon);
 		}
 		break;
 	}
