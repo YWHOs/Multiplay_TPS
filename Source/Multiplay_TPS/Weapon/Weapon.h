@@ -44,6 +44,8 @@ public:
 	bool IsAmmoFull();
 	void AddAmmo(int32 _Ammo);
 
+	void EnableCustomDepth(bool _bEnable);
+
 public:
 	// Texture Crosshairs
 	UPROPERTY(EditAnywhere, Category = Crosshairs)

@@ -28,6 +28,10 @@ AWeapon::AWeapon()
 	weaponMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 	weaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+	weaponMesh->SetCustomDepthStencilValue(CUSTOM_DEPTH_TAN);
+	weaponMesh->MarkRenderStateDirty();
+	EnableCustomDepth(true);
+
 	areaSphere = CreateDefaultSubobject<USphereComponent>(TEXT("AreaSphere"));
 	areaSphere->SetupAttachment(RootComponent);
 	areaSphere->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
@@ -60,6 +64,13 @@ void AWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+void AWeapon::EnableCustomDepth(bool _bEnable)
+{
+	if (weaponMesh)
+	{
+		weaponMesh->SetRenderCustomDepth(_bEnable);
+	}
 }
 void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
@@ -101,6 +112,7 @@ void AWeapon::SetWeaponState(EWeaponState State)
 			weaponMesh->SetEnableGravity(true);
 			weaponMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 		}
+		EnableCustomDepth(false);
 		break;
 	case EWeaponState::EWS_Dropped:
 		if (HasAuthority())
@@ -113,6 +125,10 @@ void AWeapon::SetWeaponState(EWeaponState State)
 		weaponMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
 		weaponMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 		weaponMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+		
+		weaponMesh->SetCustomDepthStencilValue(CUSTOM_DEPTH_TAN);
+		weaponMesh->MarkRenderStateDirty();
+		EnableCustomDepth(true);
 		break;
 	}
 
@@ -132,6 +148,7 @@ void AWeapon::OnRep_WeaponState()
 				weaponMesh->SetEnableGravity(true);
 				weaponMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 			}
+			EnableCustomDepth(false);
 			break;
 	case EWeaponState::EWS_Dropped:
 		weaponMesh->SetSimulatePhysics(true);
@@ -140,6 +157,10 @@ void AWeapon::OnRep_WeaponState()
 		weaponMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
 		weaponMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 		weaponMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+
+		weaponMesh->SetCustomDepthStencilValue(CUSTOM_DEPTH_TAN);
+		weaponMesh->MarkRenderStateDirty();
+		EnableCustomDepth(true);
 		break;
 	}
 }
