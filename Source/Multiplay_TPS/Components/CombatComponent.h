@@ -145,6 +145,11 @@ private:
 	UPROPERTY(EditAnywhere)
 	int32 startGrenadeAmmo = 0;
 
+	UPROPERTY(ReplicatedUsing = OnRep_Grenade)
+	int32 grenade = 2;
+	UPROPERTY(EditAnywhere)
+	int32 maxGrenade = 3;
+
 	UPROPERTY(ReplicatedUsing = OnRep_CombatState)
 	ECombatState combatState = ECombatState::ECS_Unoccupied;
 
@@ -165,9 +170,11 @@ private:
 	void UpdateAmmo();
 	void UpdateShotgunAmmo();
 	void ShowGrenade(bool _bShow);
+	UFUNCTION()
+	void OnRep_Grenade();
+	void UpdateHUDGrenade();
 
 public:	
 	FORCEINLINE ATPSCharacter* GetCharacter() { return character; }
-
-		
+	FORCEINLINE int32 GetGrenade() const { return grenade; }
 };

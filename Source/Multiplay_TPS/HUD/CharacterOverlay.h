@@ -38,4 +38,7 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* countdownText;
+
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* grenadeText;
 };

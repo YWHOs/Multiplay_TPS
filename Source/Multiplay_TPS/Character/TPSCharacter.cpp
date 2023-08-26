@@ -529,6 +529,7 @@ void ATPSCharacter::OnRep_Health()
 }
 void ATPSCharacter::ReceiveDamage(AActor* _DamagedActor, float _Damage, const UDamageType* _DamageType, class AController* _InstigatorController, AActor* _DamageCauser)
 {
+	if (bElimmed) return;
 	health = FMath::Clamp(health - _Damage, 0.f, maxHealth);
 	UpdateHUDHealth();
 	PlayHitReactMontage();

@@ -312,6 +312,7 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(UCombatComponent, bAiming);
 	DOREPLIFETIME_CONDITION(UCombatComponent, carriedAmmo, COND_OwnerOnly);
 	DOREPLIFETIME(UCombatComponent, combatState);
+	DOREPLIFETIME(UCombatComponent, grenade);
 }
 
 void UCombatComponent::EquipWeapon(AWeapon* _WeaponToEquip)
@@ -390,6 +391,7 @@ void UCombatComponent::ReloadEmptyWeapon()
 }
 void UCombatComponent::ThrowGrenade()
 {
+	if (grenade == 0) return;
 	if (combatState != ECombatState::ECS_Unoccupied || equippedWeapon == nullptr) return;
 	combatState = ECombatState::ECS_ThrowingGrenade;
 	if (character)
@@ -402,16 +404,31 @@ void UCombatComponent::ThrowGrenade()
 	{
 		ServerThrowGrenade();
 	}
-
+	if (character && character->HasAuthority())
+	{
+		grenade = FMath::Clamp(grenade - 1, 0, maxGrenade);
+		UpdateHUDGrenade();
+	}
 }
 void UCombatComponent::ServerThrowGrenade_Implementation()
 {
+	if (grenade == 0) return;
 	combatState = ECombatState::ECS_ThrowingGrenade;
 	if (character)
 	{
 		character->PlayThrowGrenadeMontage();
 		AttachActorToLeftHand(equippedWeapon);
 		ShowGrenade(true);
+	}
+	grenade = FMath::Clamp(grenade - 1, 0, maxGrenade);
+	UpdateHUDGrenade();
+}
+void UCombatComponent::UpdateHUDGrenade()
+{
+	controller = controller == nullptr ? Cast<ATPSPlayerController>(character->Controller) : controller;
+	if (controller)
+	{
+		controller->SetHUDGrenade(grenade);
 	}
 }
 void UCombatComponent::ThrowGrenadeFinished()
@@ -450,6 +467,10 @@ void UCombatComponent::ServerLaunchGrenade_Implementation(const FVector_NetQuant
 			world->SpawnActor<AProjectile>(grenadeClass, startLocation, toTarget.Rotation(), spawnParams);
 		}
 	}
+}
+void UCombatComponent::OnRep_Grenade()
+{
+	UpdateHUDGrenade();
 }
 void UCombatComponent::Reload()
 {

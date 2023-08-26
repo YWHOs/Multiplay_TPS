@@ -26,6 +26,7 @@ public:
 	void SetHUDCarriedAmmo(int32 _Ammo);
 	void SetHUDCountdown(float _Count);
 	void SetHUDAnnouncement(float _Count);
+	void SetHUDGrenade(int32 _Grenade);
 	virtual void OnPossess(APawn* _Pawn) override;
 	virtual void Tick(float DeltaTime) override;
 
@@ -87,4 +88,5 @@ private:
 	float HUDMaxHealth;
 	float HUDScore;
 	int32 HUDDie;
+	int32 HUDGrenade;
 };

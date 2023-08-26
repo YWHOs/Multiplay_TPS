@@ -48,6 +48,12 @@ void ATPSPlayerController::PollInit()
 				SetHUDHealth(HUDHealth, HUDMaxHealth);
 				SetHUDScore(HUDScore);
 				SetHUDDie(HUDDie);
+				ATPSCharacter* TPSCharacter = Cast<ATPSCharacter>(GetPawn());
+				if (TPSCharacter && TPSCharacter->GetCombatComponent())
+				{
+					SetHUDGrenade(TPSCharacter->GetCombatComponent()->GetGrenade());
+				}
+
 			}
 		}
 	}
@@ -205,7 +211,20 @@ void ATPSPlayerController::SetHUDAnnouncement(float _Count)
 		TPSHUD->announcement->warmupText->SetText(FText::FromString(countdownText));
 	}
 }
-
+void ATPSPlayerController::SetHUDGrenade(int32 _Grenade)
+{
+	TPSHUD = TPSHUD == nullptr ? Cast<ATPSHUD>(GetHUD()) : TPSHUD;
+	bool bValid = TPSHUD && TPSHUD->characterOverlay && TPSHUD->characterOverlay->grenadeText;
+	if (bValid)
+	{
+		FString grenadeText = FString::Printf(TEXT("%d"), _Grenade);
+		TPSHUD->characterOverlay->grenadeText->SetText(FText::FromString(grenadeText));
+	}
+	else
+	{
+		HUDGrenade = _Grenade;
+	}
+}
 void ATPSPlayerController::SetHUDTime()
 {
 	float leftTime = 0.f;
