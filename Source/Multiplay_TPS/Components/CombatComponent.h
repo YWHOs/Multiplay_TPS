@@ -38,6 +38,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void ThrowGrenadeFinished();
+	UFUNCTION(BlueprintCallable)
+	void LaunchGrenade();
+	UFUNCTION(Server, Reliable)
+	void ServerLaunchGrenade(const FVector_NetQuantize& _Target);
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -73,6 +77,11 @@ protected:
 	void UpdateCarriedAmmo();
 	void PlayEquipWeaponSound();
 	void ReloadEmptyWeapon();
+
+protected:
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AProjectile> grenadeClass;
+
 private:
 	UPROPERTY()
 	class ATPSCharacter* character;
@@ -155,6 +164,7 @@ private:
 	void OnRep_CombatState();
 	void UpdateAmmo();
 	void UpdateShotgunAmmo();
+	void ShowGrenade(bool _bShow);
 
 public:	
 	FORCEINLINE ATPSCharacter* GetCharacter() { return character; }

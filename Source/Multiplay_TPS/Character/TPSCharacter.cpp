@@ -57,6 +57,10 @@ ATPSCharacter::ATPSCharacter()
 	MinNetUpdateFrequency = 33.f;
 
 	dissolveTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("DissolveTimeline"));
+
+	attachGrenade = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Attach Grenade"));
+	attachGrenade->SetupAttachment(GetMesh(), FName("GrenadeSocket"));
+	attachGrenade->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 void ATPSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
@@ -86,6 +90,10 @@ void ATPSCharacter::BeginPlay()
 	if (HasAuthority())
 	{
 		OnTakeAnyDamage.AddDynamic(this, &ATPSCharacter::ReceiveDamage);
+	}
+	if (attachGrenade)
+	{
+		attachGrenade->SetVisibility(false);
 	}
 }
 void ATPSCharacter::Destroyed()

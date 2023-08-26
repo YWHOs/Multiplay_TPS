@@ -158,6 +158,9 @@ private:
 	UPROPERTY()
 	ATPSPlayerState* TPSPlayerState;
 
+	UPROPERTY(VisibleAnywhere)
+		UStaticMeshComponent* attachGrenade;
+
 private:
 	UFUNCTION(Server, Reliable)
 	void ServerEquipButtonPressed();
@@ -192,4 +195,5 @@ public:
 	FORCEINLINE UCombatComponent* GetCombatComponent() const { return combatComponent; }
 	FORCEINLINE bool GetDisableGameplay() const { return bDisableGameplay; }
 	FORCEINLINE UAnimMontage* GetReloadMontage() const { return reloadMontage; }
+	FORCEINLINE UStaticMeshComponent* GetAttachGrenade() const { return attachGrenade; }
 };

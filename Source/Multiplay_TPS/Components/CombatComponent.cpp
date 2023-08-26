@@ -14,6 +14,7 @@
 #include "TimerManager.h"
 #include "Sound/SoundCue.h"
 #include "Multiplay_TPS/Character/TPSAnimInstance.h"
+#include "Multiplay_TPS/Weapon/Projectile.h"
 
 // Sets default values for this component's properties
 UCombatComponent::UCombatComponent()
@@ -389,12 +390,13 @@ void UCombatComponent::ReloadEmptyWeapon()
 }
 void UCombatComponent::ThrowGrenade()
 {
-	if (combatState != ECombatState::ECS_Unoccupied) return;
+	if (combatState != ECombatState::ECS_Unoccupied || equippedWeapon == nullptr) return;
 	combatState = ECombatState::ECS_ThrowingGrenade;
 	if (character)
 	{
 		character->PlayThrowGrenadeMontage();
 		AttachActorToLeftHand(equippedWeapon);
+		ShowGrenade(true);
 	}
 	if (character && !character->HasAuthority())
 	{
@@ -409,6 +411,7 @@ void UCombatComponent::ServerThrowGrenade_Implementation()
 	{
 		character->PlayThrowGrenadeMontage();
 		AttachActorToLeftHand(equippedWeapon);
+		ShowGrenade(true);
 	}
 }
 void UCombatComponent::ThrowGrenadeFinished()
@@ -416,9 +419,41 @@ void UCombatComponent::ThrowGrenadeFinished()
 	combatState = ECombatState::ECS_Unoccupied;
 	AttachActorToRightHand(equippedWeapon);
 }
+void UCombatComponent::ShowGrenade(bool _bShow)
+{
+	if (character && character->GetAttachGrenade())
+	{
+		character->GetAttachGrenade()->SetVisibility(_bShow);
+	}
+}
+void UCombatComponent::LaunchGrenade()
+{
+	ShowGrenade(false);
+	if (character && character->IsLocallyControlled())
+	{
+		ServerLaunchGrenade(hitTarget);
+	}
+
+}
+void UCombatComponent::ServerLaunchGrenade_Implementation(const FVector_NetQuantize& _Target)
+{
+	if (character && grenadeClass && character->GetAttachGrenade())
+	{
+		const FVector startLocation = character->GetAttachGrenade()->GetComponentLocation();
+		FVector toTarget = _Target - startLocation;
+		FActorSpawnParameters spawnParams;
+		spawnParams.Owner = character;
+		spawnParams.Instigator = character;
+		UWorld* world = GetWorld();
+		if (world)
+		{
+			world->SpawnActor<AProjectile>(grenadeClass, startLocation, toTarget.Rotation(), spawnParams);
+		}
+	}
+}
 void UCombatComponent::Reload()
 {
-	if (carriedAmmo > 0 && combatState == ECombatState::ECS_Unoccupied)
+	if (carriedAmmo > 0 && combatState == ECombatState::ECS_Unoccupied && equippedWeapon && !equippedWeapon->IsAmmoFull())
 	{
 		ServerReload();
 	}
@@ -533,6 +568,7 @@ void UCombatComponent::OnRep_CombatState()
 		{
 			character->PlayThrowGrenadeMontage();
 			AttachActorToLeftHand(equippedWeapon);
+			ShowGrenade(true);
 		}
 		break;
 	}
