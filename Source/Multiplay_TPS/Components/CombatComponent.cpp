@@ -513,6 +513,19 @@ void UCombatComponent::ShotgunShellReload()
 		UpdateShotgunAmmo();
 	}
 }
+void UCombatComponent::PickupAmmo(EWeaponType _WeaponType, int32 _AmmoAmount)
+{
+	if (carriedAmmoMap.Contains(_WeaponType))
+	{
+		carriedAmmoMap[_WeaponType] = FMath::Clamp(carriedAmmoMap[_WeaponType] + _AmmoAmount, 0, maxCarriedAmmo);
+
+		UpdateCarriedAmmo();
+	}
+	if (equippedWeapon && equippedWeapon->IsAmmoEmpty() && equippedWeapon->GetWeaponType() == _WeaponType)
+	{
+		Reload();
+	}
+}
 void UCombatComponent::UpdateAmmo()
 {
 	if (character == nullptr || equippedWeapon == nullptr) return;

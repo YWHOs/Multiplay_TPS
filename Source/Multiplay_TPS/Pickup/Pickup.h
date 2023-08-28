@@ -22,6 +22,10 @@ protected:
 	UFUNCTION()
 	virtual void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OhterComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+protected:
+	UPROPERTY(EditAnywhere)
+	float baseTurnRate = 45.f;
+
 private:
 	UPROPERTY(EditAnywhere)
 	USphereComponent* overlapSphere;
