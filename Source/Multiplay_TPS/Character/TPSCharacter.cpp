@@ -10,6 +10,7 @@
 #include "Multiplay_TPS/Weapon/Weapon.h"
 #include "Multiplay_TPS/Weapon/WeaponTypes.h"
 #include "Multiplay_TPS/Components/CombatComponent.h"
+#include "Multiplay_TPS/Components/BuffComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "TPSAnimInstance.h"
@@ -43,6 +44,9 @@ ATPSCharacter::ATPSCharacter()
 
 	combatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	combatComponent->SetIsReplicated(true);
+
+	buffComponent = CreateDefaultSubobject<UBuffComponent>(TEXT("BuffComponent"));
+	buffComponent->SetIsReplicated(true);
 
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
@@ -197,6 +201,10 @@ void ATPSCharacter::PostInitializeComponents()
 	if (combatComponent)
 	{
 		combatComponent->character = this;
+	}
+	if (buffComponent)
+	{
+		buffComponent->character = this;
 	}
 }
 

@@ -94,6 +94,8 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UCombatComponent* combatComponent;
+	UPROPERTY(VisibleAnywhere)
+	class UBuffComponent* buffComponent;
 
 	float ao_Yaw;
 	float ao_Pitch;
@@ -159,7 +161,7 @@ private:
 	ATPSPlayerState* TPSPlayerState;
 
 	UPROPERTY(VisibleAnywhere)
-		UStaticMeshComponent* attachGrenade;
+	UStaticMeshComponent* attachGrenade;
 
 private:
 	UFUNCTION(Server, Reliable)
