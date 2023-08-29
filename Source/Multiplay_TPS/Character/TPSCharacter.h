@@ -76,6 +76,7 @@ public:
 	void ShowSniperScope(bool _bShow);
 
 	void UpdateHUDHealth();
+	void UpdateHUDShield();
 public:
 	UPROPERTY(Replicated)
 	bool bDisableGameplay = false;
@@ -134,6 +135,12 @@ private:
 	UPROPERTY(ReplicatedUsing = OnRep_Health, VisibleAnywhere, Category = "Stat")
 	float health = 100.f;
 
+	// Shield
+	UPROPERTY(EditAnywhere, Category = "Stat")
+	float maxShield = 100.f;
+	UPROPERTY(ReplicatedUsing = OnRep_Shield, VisibleAnywhere, Category = "Stat")
+	float shield = 100.f;
+
 	UPROPERTY()
 	ATPSPlayerController* TPSController;
 	bool bElimmed = false;
@@ -177,6 +184,8 @@ private:
 
 	UFUNCTION()
 	void OnRep_Health(float _LastHealth);
+	UFUNCTION()
+	void OnRep_Shield(float _LastShield);
 
 	void ElimTimerFinish();
 	UFUNCTION()

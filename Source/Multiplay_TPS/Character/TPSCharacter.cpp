@@ -72,6 +72,7 @@ void ATPSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 
 	DOREPLIFETIME_CONDITION(ATPSCharacter, overlappingWeapon, COND_OwnerOnly);
 	DOREPLIFETIME(ATPSCharacter, health);
+	DOREPLIFETIME(ATPSCharacter, shield);
 	DOREPLIFETIME(ATPSCharacter, bDisableGameplay);
 }
 void ATPSCharacter::TickInit()
@@ -91,6 +92,7 @@ void ATPSCharacter::BeginPlay()
 	Super::BeginPlay();
 	
 	UpdateHUDHealth();
+	UpdateHUDShield();
 	if (HasAuthority())
 	{
 		OnTakeAnyDamage.AddDynamic(this, &ATPSCharacter::ReceiveDamage);
@@ -121,6 +123,14 @@ void ATPSCharacter::UpdateHUDHealth()
 	if (TPSController)
 	{
 		TPSController->SetHUDHealth(health, maxHealth);
+	}
+}
+void ATPSCharacter::UpdateHUDShield()
+{
+	TPSController = TPSController == nullptr ? Cast<ATPSPlayerController>(Controller) : TPSController;
+	if (TPSController)
+	{
+		TPSController->SetHUDShield(shield, maxShield);
 	}
 }
 void ATPSCharacter::Tick(float DeltaTime)
@@ -206,6 +216,7 @@ void ATPSCharacter::PostInitializeComponents()
 	{
 		buffComponent->character = this;
 		buffComponent->SetInitialSpeed(GetCharacterMovement()->MaxWalkSpeed, GetCharacterMovement()->MaxWalkSpeedCrouched);
+		buffComponent->SetInitialJump(GetCharacterMovement()->JumpZVelocity);
 	}
 }
 
@@ -539,11 +550,35 @@ void ATPSCharacter::OnRep_Health(float _LastHealth)
 		PlayHitReactMontage();
 	}
 }
+void ATPSCharacter::OnRep_Shield(float _LastShield)
+{
+	UpdateHUDShield();
+	if (shield < _LastShield)
+	{
+		PlayHitReactMontage();
+	}
+}
 void ATPSCharacter::ReceiveDamage(AActor* _DamagedActor, float _Damage, const UDamageType* _DamageType, class AController* _InstigatorController, AActor* _DamageCauser)
 {
 	if (bElimmed) return;
-	health = FMath::Clamp(health - _Damage, 0.f, maxHealth);
+	
+	float damageToHealth = _Damage;
+	if (shield > 0.f)
+	{
+		if (shield >= _Damage)
+		{
+			shield = FMath::Clamp(shield - _Damage, 0.f, maxShield);
+			damageToHealth = 0.f;
+		}
+		else
+		{
+			shield = 0.f;
+			damageToHealth = FMath::Clamp(damageToHealth - shield, 0.f, _Damage);
+		}
+	}
+	health = FMath::Clamp(health - damageToHealth, 0.f, maxHealth);
 	UpdateHUDHealth();
+	UpdateHUDShield();
 	PlayHitReactMontage();
 
 	if (health == 0.f)

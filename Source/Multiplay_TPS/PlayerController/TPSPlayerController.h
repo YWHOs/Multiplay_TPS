@@ -20,6 +20,7 @@ class MULTIPLAY_TPS_API ATPSPlayerController : public APlayerController
 	
 public:
 	void SetHUDHealth(float _Health, float _MaxHealth);
+	void SetHUDShield(float _Shield, float _MaxShield);
 	void SetHUDScore(float _Score);
 	void SetHUDDie(int32 _Die);
 	void SetHUDAmmo(int32 _Ammo);
@@ -82,11 +83,21 @@ private:
 
 	UPROPERTY()
 	UCharacterOverlay* characterOverlay;
-	bool bInitCharacterOverlay = false;
-
+	
 	float HUDHealth;
 	float HUDMaxHealth;
+	bool bInitHealth = false;
+
+	float HUDShield;
+	float HUDMaxShield;
+	bool bInitShield = false;
+
 	float HUDScore;
+	bool bInitScore = false;
+
 	int32 HUDDie;
+	bool bInitDie = false;
+
 	int32 HUDGrenade;
+	bool bInitGrenade = false;
 };

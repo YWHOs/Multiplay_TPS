@@ -45,13 +45,14 @@ void ATPSPlayerController::PollInit()
 			characterOverlay = TPSHUD->characterOverlay;
 			if (characterOverlay)
 			{
-				SetHUDHealth(HUDHealth, HUDMaxHealth);
-				SetHUDScore(HUDScore);
-				SetHUDDie(HUDDie);
+				if (bInitHealth) SetHUDHealth(HUDHealth, HUDMaxHealth);
+				if (bInitShield) SetHUDShield(HUDShield, HUDMaxShield);
+				if (bInitScore) SetHUDScore(HUDScore);
+				if (bInitDie) SetHUDDie(HUDDie);
 				ATPSCharacter* TPSCharacter = Cast<ATPSCharacter>(GetPawn());
 				if (TPSCharacter && TPSCharacter->GetCombatComponent())
 				{
-					SetHUDGrenade(TPSCharacter->GetCombatComponent()->GetGrenade());
+					if (bInitGrenade) SetHUDGrenade(TPSCharacter->GetCombatComponent()->GetGrenade());
 				}
 
 			}
@@ -116,9 +117,27 @@ void ATPSPlayerController::SetHUDHealth(float _Health, float _MaxHealth)
 	}
 	else
 	{
-		bInitCharacterOverlay = true;
+		bInitHealth = true;
 		HUDHealth = _Health;
 		HUDMaxHealth = _MaxHealth;
+	}
+}
+void ATPSPlayerController::SetHUDShield(float _Shield, float _MaxShield)
+{
+	TPSHUD = TPSHUD == nullptr ? Cast<ATPSHUD>(GetHUD()) : TPSHUD;
+	bool bValid = TPSHUD && TPSHUD->characterOverlay && TPSHUD->characterOverlay->shieldBar && TPSHUD->characterOverlay->shieldText;
+	if (bValid)
+	{
+		const float shieldPercent = _Shield / _MaxShield;
+		TPSHUD->characterOverlay->shieldBar->SetPercent(shieldPercent);
+		FString shieldText = FString::Printf(TEXT("%d/%d"), FMath::CeilToInt(_Shield), FMath::CeilToInt(_MaxShield));
+		TPSHUD->characterOverlay->shieldText->SetText(FText::FromString(shieldText));
+	}
+	else
+	{
+		bInitShield = true;
+		HUDShield = _Shield;
+		HUDMaxShield = _MaxShield;
 	}
 }
 
@@ -133,7 +152,7 @@ void ATPSPlayerController::SetHUDScore(float _Score)
 	}
 	else
 	{
-		bInitCharacterOverlay = true;
+		bInitScore = true;
 		HUDScore = _Score;
 	}
 }
@@ -149,7 +168,7 @@ void ATPSPlayerController::SetHUDDie(int32 _Die)
 	}
 	else
 	{
-		bInitCharacterOverlay = true;
+		bInitDie = true;
 		HUDDie = _Die;
 	}
 }
@@ -222,6 +241,7 @@ void ATPSPlayerController::SetHUDGrenade(int32 _Grenade)
 	}
 	else
 	{
+		bInitGrenade = true;
 		HUDGrenade = _Grenade;
 	}
 }

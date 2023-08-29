@@ -20,7 +20,9 @@ public:
 
 	void Heal(float _Heal, float _HealTime);
 	void Speed(float _BaseSpeed, float _CrouchSpeed, float _BuffTime);
+	void Jump(float _Jump, float _BuffTime);
 	void SetInitialSpeed(float _BaseSpeed, float _CrouchSpeed);
+	void SetInitialJump(float _Jump);
 public:
 	friend class ATPSCharacter;
 
@@ -33,6 +35,10 @@ private:
 	void ResetSpeed();
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastSpeedBuff(float _BaseSpeed, float _CrouchSpeed);
+
+	void ResetJump();
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastJumpBuff(float _Jump);
 private:
 	UPROPERTY()
 	ATPSCharacter* character;
@@ -46,5 +52,8 @@ private:
 	FTimerHandle speedBuffTimer;
 	float initialBaseSpeed;
 	float initialCrouchSpeed;
-		
+
+	// Jump
+	FTimerHandle jumpBuffTimer;
+	float initialJump;
 };
