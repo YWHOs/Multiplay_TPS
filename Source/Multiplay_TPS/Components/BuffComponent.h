@@ -19,7 +19,8 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	void Heal(float _Heal, float _HealTime);
-
+	void Speed(float _BaseSpeed, float _CrouchSpeed, float _BuffTime);
+	void SetInitialSpeed(float _BaseSpeed, float _CrouchSpeed);
 public:
 	friend class ATPSCharacter;
 
@@ -29,11 +30,21 @@ protected:
 	void HealRampUp(float _DeltaTime);
 
 private:
+	void ResetSpeed();
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastSpeedBuff(float _BaseSpeed, float _CrouchSpeed);
+private:
 	UPROPERTY()
 	ATPSCharacter* character;
 
+	// Heal
 	bool bHealing = false;
 	float healRate = 0.f;
 	float amountToHeal = 0.f;
+
+	// Speed
+	FTimerHandle speedBuffTimer;
+	float initialBaseSpeed;
+	float initialCrouchSpeed;
 		
 };

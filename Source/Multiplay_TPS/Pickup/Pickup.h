@@ -8,6 +8,8 @@
 
 class USphereComponent;
 class USoundCue;
+class UNiagaraComponent;
+class UNiagaraSystem;
 UCLASS()
 class MULTIPLAY_TPS_API APickup : public AActor
 {
@@ -33,6 +35,12 @@ private:
 	USoundCue* pickupSound;
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* pickupMesh;
+
+	UPROPERTY(VisibleAnywhere)
+	UNiagaraComponent* pickupEffectComponent;
+
+	UPROPERTY(EditAnywhere)
+	UNiagaraSystem* pickupEffect;
 public:	
 
 

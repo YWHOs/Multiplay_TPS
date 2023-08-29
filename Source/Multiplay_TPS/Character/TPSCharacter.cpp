@@ -205,6 +205,7 @@ void ATPSCharacter::PostInitializeComponents()
 	if (buffComponent)
 	{
 		buffComponent->character = this;
+		buffComponent->SetInitialSpeed(GetCharacterMovement()->MaxWalkSpeed, GetCharacterMovement()->MaxWalkSpeedCrouched);
 	}
 }
 
