@@ -30,11 +30,11 @@ void AHealthPickup::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	ATPSCharacter* TPSCharacter = Cast<ATPSCharacter>(OtherActor);
 	if (TPSCharacter)
 	{
-		/*UBuffComponent* cComponent = TPSCharacter->GetCombatComponent();
-		if (combatComponent)
+		UBuffComponent* buffComponent = TPSCharacter->GetBuffComponent();
+		if (buffComponent)
 		{
-			combatComponent->PickupAmmo(weaponType, ammoAmount);
-		}*/
+			buffComponent->Heal(heal, healTime);
+		}
 	}
 	Destroy();
 }

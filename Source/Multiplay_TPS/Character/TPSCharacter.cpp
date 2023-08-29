@@ -530,10 +530,13 @@ void ATPSCharacter::OnRep_OverlappingWeapon(AWeapon* _LastWeapon)
 		_LastWeapon->ShowPickupWidget(false);
 	}
 }
-void ATPSCharacter::OnRep_Health()
+void ATPSCharacter::OnRep_Health(float _LastHealth)
 {
 	UpdateHUDHealth();
-	PlayHitReactMontage();
+	if (health < _LastHealth)
+	{
+		PlayHitReactMontage();
+	}
 }
 void ATPSCharacter::ReceiveDamage(AActor* _DamagedActor, float _Damage, const UDamageType* _DamageType, class AController* _InstigatorController, AActor* _DamageCauser)
 {

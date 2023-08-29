@@ -18,16 +18,22 @@ public:
 	UBuffComponent();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	void Heal(float _Heal, float _HealTime);
+
 public:
 	friend class ATPSCharacter;
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+	void HealRampUp(float _DeltaTime);
 
 private:
 	UPROPERTY()
 	ATPSCharacter* character;
 
+	bool bHealing = false;
+	float healRate = 0.f;
+	float amountToHeal = 0.f;
 		
 };

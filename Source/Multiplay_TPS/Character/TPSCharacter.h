@@ -26,7 +26,6 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	void UpdateHUDHealth();
 	void MoveForward(float _value);
 	void MoveRight(float _value);
 	void Turn(float _value);
@@ -76,6 +75,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void ShowSniperScope(bool _bShow);
 
+	void UpdateHUDHealth();
 public:
 	UPROPERTY(Replicated)
 	bool bDisableGameplay = false;
@@ -176,7 +176,7 @@ private:
 	float CalculateSpeed();
 
 	UFUNCTION()
-	void OnRep_Health();
+	void OnRep_Health(float _LastHealth);
 
 	void ElimTimerFinish();
 	UFUNCTION()
@@ -193,8 +193,10 @@ public:
 	FORCEINLINE bool ShouldRotateRootBone() const { return bRotateRootBone; }
 	FORCEINLINE bool IsElimmed() const { return bElimmed; }
 	FORCEINLINE float GetHealth() const { return health; }
+	FORCEINLINE void SetHealth(float _Value) {  health = _Value; }
 	FORCEINLINE float GetMaxHealth() const { return maxHealth; }
 	FORCEINLINE UCombatComponent* GetCombatComponent() const { return combatComponent; }
+	FORCEINLINE UBuffComponent* GetBuffComponent() const { return buffComponent; }
 	FORCEINLINE bool GetDisableGameplay() const { return bDisableGameplay; }
 	FORCEINLINE UAnimMontage* GetReloadMontage() const { return reloadMontage; }
 	FORCEINLINE UStaticMeshComponent* GetAttachGrenade() const { return attachGrenade; }
