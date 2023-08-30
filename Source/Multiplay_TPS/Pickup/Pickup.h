@@ -29,6 +29,9 @@ protected:
 	float baseTurnRate = 45.f;
 
 private:
+	void BindOverlapTimerFinish();
+
+private:
 	UPROPERTY(EditAnywhere)
 	USphereComponent* overlapSphere;
 	UPROPERTY(EditAnywhere)
@@ -41,6 +44,10 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	UNiagaraSystem* pickupEffect;
+
+	FTimerHandle bindOverlapTimer;
+	float bindOverlapTime = 0.3f;
+	
 public:	
 
 

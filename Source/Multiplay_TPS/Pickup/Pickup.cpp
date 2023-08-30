@@ -39,10 +39,10 @@ APickup::APickup()
 void APickup::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	if (HasAuthority())
 	{
-		overlapSphere->OnComponentBeginOverlap.AddDynamic(this, &APickup::OnSphereOverlap);
+		GetWorldTimerManager().SetTimer(bindOverlapTimer, this, &APickup::BindOverlapTimerFinish, bindOverlapTime);
 	}
 
 }
@@ -75,4 +75,10 @@ void APickup::Destroyed()
 void APickup::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OhterComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 
+}
+
+void APickup::BindOverlapTimerFinish()
+{
+	// Pickup, 캐릭터와 겹쳤을 때 생성 가능
+	overlapSphere->OnComponentBeginOverlap.AddDynamic(this, &APickup::OnSphereOverlap);
 }
