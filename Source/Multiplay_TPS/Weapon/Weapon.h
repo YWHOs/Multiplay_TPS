@@ -74,6 +74,8 @@ public:
 	UPROPERTY(EditAnywhere)
 	USoundCue* equipSound;
 
+	bool bDestroyWeapon = false;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

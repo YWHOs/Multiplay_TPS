@@ -90,9 +90,11 @@ void ATPSCharacter::TickInit()
 void ATPSCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	SpawnDefaultWeapon();
+	UpdateHUDAmmo();
 	UpdateHUDHealth();
 	UpdateHUDShield();
+
 	if (HasAuthority())
 	{
 		OnTakeAnyDamage.AddDynamic(this, &ATPSCharacter::ReceiveDamage);
@@ -117,6 +119,20 @@ void ATPSCharacter::Destroyed()
 		combatComponent->equippedWeapon->Destroy();
 	}
 }
+void ATPSCharacter::SpawnDefaultWeapon()
+{
+	ATPSGameMode* TPSGameMode = Cast<ATPSGameMode>(UGameplayStatics::GetGameMode(this));
+	UWorld* world = GetWorld();
+	if (TPSGameMode && world && !bElimmed && defaultWeapon)
+	{
+		AWeapon* startWeapon = world->SpawnActor<AWeapon>(defaultWeapon);
+		startWeapon->bDestroyWeapon = true;
+		if (combatComponent)
+		{
+			combatComponent->EquipWeapon(startWeapon);
+		}
+	}
+}
 void ATPSCharacter::UpdateHUDHealth()
 {
 	TPSController = TPSController == nullptr ? Cast<ATPSPlayerController>(Controller) : TPSController;
@@ -131,6 +147,15 @@ void ATPSCharacter::UpdateHUDShield()
 	if (TPSController)
 	{
 		TPSController->SetHUDShield(shield, maxShield);
+	}
+}
+void ATPSCharacter::UpdateHUDAmmo()
+{
+	TPSController = TPSController == nullptr ? Cast<ATPSPlayerController>(Controller) : TPSController;
+	if (TPSController && combatComponent && combatComponent->equippedWeapon)
+	{
+		TPSController->SetHUDCarriedAmmo(combatComponent->carriedAmmo);
+		TPSController->SetHUDAmmo(combatComponent->equippedWeapon->GetAmmo());
 	}
 }
 void ATPSCharacter::Tick(float DeltaTime)
@@ -620,7 +645,14 @@ void ATPSCharacter::Elim()
 {
 	if (combatComponent && combatComponent->equippedWeapon)
 	{
-		combatComponent->equippedWeapon->Dropped();
+		if (combatComponent->equippedWeapon->bDestroyWeapon)
+		{
+			combatComponent->equippedWeapon->Destroy();
+		}
+		else
+		{
+			combatComponent->equippedWeapon->Dropped();
+		}
 	}
 	MulticastElim();
 	GetWorldTimerManager().SetTimer(elimTimer, this, &ATPSCharacter::ElimTimerFinish, elimDelay);

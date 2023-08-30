@@ -49,6 +49,8 @@ void ATPSPlayerController::PollInit()
 				if (bInitShield) SetHUDShield(HUDShield, HUDMaxShield);
 				if (bInitScore) SetHUDScore(HUDScore);
 				if (bInitDie) SetHUDDie(HUDDie);
+				if (bInitAmmo) SetHUDAmmo(HUDAmmo);
+				if (bInitCarriedAmmo) SetHUDCarriedAmmo(HUDCarriedAmmo);
 				ATPSCharacter* TPSCharacter = Cast<ATPSCharacter>(GetPawn());
 				if (TPSCharacter && TPSCharacter->GetCombatComponent())
 				{
@@ -182,6 +184,11 @@ void ATPSPlayerController::SetHUDAmmo(int32 _Ammo)
 		FString ammoText = FString::Printf(TEXT("%d"), _Ammo);
 		TPSHUD->characterOverlay->ammoAmountText->SetText(FText::FromString(ammoText));
 	}
+	else
+	{
+		bInitAmmo = true;
+		HUDAmmo = _Ammo;
+	}
 }
 void ATPSPlayerController::SetHUDCarriedAmmo(int32 _Ammo)
 {
@@ -191,6 +198,11 @@ void ATPSPlayerController::SetHUDCarriedAmmo(int32 _Ammo)
 	{
 		FString ammoText = FString::Printf(TEXT("%d"), _Ammo);
 		TPSHUD->characterOverlay->carriedAmountText->SetText(FText::FromString(ammoText));
+	}
+	else
+	{
+		bInitCarriedAmmo = true;
+		HUDCarriedAmmo = _Ammo;
 	}
 }
 

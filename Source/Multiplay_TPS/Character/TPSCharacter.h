@@ -77,6 +77,9 @@ public:
 
 	void UpdateHUDHealth();
 	void UpdateHUDShield();
+	void UpdateHUDAmmo();
+
+	void SpawnDefaultWeapon();
 public:
 	UPROPERTY(Replicated)
 	bool bDisableGameplay = false;
@@ -169,6 +172,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* attachGrenade;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AWeapon> defaultWeapon;
 
 private:
 	UFUNCTION(Server, Reliable)
