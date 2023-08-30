@@ -19,6 +19,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	void Heal(float _Heal, float _HealTime);
+	void Shield(float _Shield, float _ShieldTime);
 	void Speed(float _BaseSpeed, float _CrouchSpeed, float _BuffTime);
 	void Jump(float _Jump, float _BuffTime);
 	void SetInitialSpeed(float _BaseSpeed, float _CrouchSpeed);
@@ -30,6 +31,7 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 	void HealRampUp(float _DeltaTime);
+	void ShieldRampUp(float _DeltaTime);
 
 private:
 	void ResetSpeed();
@@ -47,6 +49,11 @@ private:
 	bool bHealing = false;
 	float healRate = 0.f;
 	float amountToHeal = 0.f;
+
+	// Shield
+	bool bShield = false;
+	float shieldRate = 0.f;
+	float amountToShield = 0.f;
 
 	// Speed
 	FTimerHandle speedBuffTimer;

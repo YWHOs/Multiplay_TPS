@@ -138,8 +138,8 @@ private:
 	// Shield
 	UPROPERTY(EditAnywhere, Category = "Stat")
 	float maxShield = 100.f;
-	UPROPERTY(ReplicatedUsing = OnRep_Shield, VisibleAnywhere, Category = "Stat")
-	float shield = 100.f;
+	UPROPERTY(ReplicatedUsing = OnRep_Shield, EditAnywhere, Category = "Stat")
+	float shield = 0.f;
 
 	UPROPERTY()
 	ATPSPlayerController* TPSController;
@@ -204,6 +204,9 @@ public:
 	FORCEINLINE float GetHealth() const { return health; }
 	FORCEINLINE void SetHealth(float _Value) {  health = _Value; }
 	FORCEINLINE float GetMaxHealth() const { return maxHealth; }
+	FORCEINLINE float GetShield() const { return shield; }
+	FORCEINLINE void SetShield(float _Value) { shield = _Value; }
+	FORCEINLINE float GetMaxShield() const { return maxShield; }
 	FORCEINLINE UCombatComponent* GetCombatComponent() const { return combatComponent; }
 	FORCEINLINE UBuffComponent* GetBuffComponent() const { return buffComponent; }
 	FORCEINLINE bool GetDisableGameplay() const { return bDisableGameplay; }
